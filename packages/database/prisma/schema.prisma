@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum IntegrationType {
+  slack
+  zulip
+}
+
+enum ChannelType {
+  socialsips
+  wouldyourather
+  spotlight
+  celebration
+}
+
+model User {
+  id                 Int           @id @default(autoincrement())
+  email              String        @unique
+  imageUrl           String?
+  name               String?
+  externalProviderId String?       @unique
+  integrations       Integration[]
+}
+
+model Integration {
+  id                  Int             @id @default(autoincrement())
+  publicId            String          @unique @default(nanoid(10))
+  token               String?
+  type                IntegrationType
+  user                User            @relation(fields: [userId], references: [id])
+  userId              Int
+  botUserId           String?
+  teamName            String?
+  teamId              String          @unique
+  appId               String?
+  onboardingCompleted Boolean         @default(false)
+  scope               String
+  active              Boolean         @default(true)
+  channels            Channel[]
+}
+
+model ChannelSetting {
+  id         Int      @id @default(autoincrement())
+  timezone   String   @default("Asia/Kolkata")
+  timeOfday  Int      @default(36000)
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  channelId  Int      @unique
+  everyNWeek Int      @default(1)
+  daysOfWeek String[] @default(["Monday", "Wednesday", "Friday"])
+}
+
+model Channel {
+  id            Int             @id @default(autoincrement())
+  publicId      String          @unique @default(nanoid(12))
+  active        Boolean         @default(true)
+  channelId     String
+  type          ChannelType
+  integration   Integration     @relation(fields: [integrationId], references: [id])
+  integrationId Int
+  setting       ChannelSetting?
+}

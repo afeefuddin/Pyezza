@@ -1,5 +1,4 @@
 import { getIntegration } from "@/actions/integration";
-import { Separator } from "@/components/ui/separator";
 import Onboarding from "./onboarding";
 
 export default async function Page({
@@ -14,7 +13,7 @@ export default async function Page({
   }
   return (
     <div className="p-8 md:p-16 w-full  overflow-y-auto">
-      <Onboarding data={data} />
+      <Onboarding data={data} integrationId={integrationId} />
     </div>
   );
 }

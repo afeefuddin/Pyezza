@@ -10,6 +10,17 @@ import { useState } from "react";
 import { ArrowLeft, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { slackChannelsResponseSchema } from "@/lib/slack-api";
+import {
+  Select,
+  SelectGroup,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select";
 const featureDetails = {
   intros: {
     title: "Team Introductions Channel",
@@ -18,15 +29,22 @@ const featureDetails = {
     recommendation:
       "We recommend using a dedicated channel for introductions to keep them organized and easily accessible.",
   },
-  discussions: {
+  wouldyourather: {
     title: "Discussion Topics Channel",
     description:
       "Select where discussion prompts and conversation starters will be posted.",
     recommendation:
       "A general or team-social channel works well for engaging discussions.",
   },
-  celebrations: {
+  celebration: {
     title: "Team Celebrations Channel",
+    description:
+      "Pick a channel for birthday wishes, work anniversaries, and other celebrations.",
+    recommendation:
+      "Consider using a dedicated celebrations channel to keep the party going!",
+  },
+  spotlight: {
+    title: "Spotlight Channel",
     description:
       "Pick a channel for birthday wishes, work anniversaries, and other celebrations.",
     recommendation:
@@ -35,38 +53,47 @@ const featureDetails = {
 };
 
 export default function OnboardingChannel({
+  integrationId,
   feature,
   onBack,
   onSubmit,
   initialChannel,
+  newChannel,
 }: {
+  integrationId: string;
   feature: string;
   onBack: () => void;
-  onSubmit: (feature: string, channel: string) => void;
+  onSubmit: (
+    feature: string,
+    channel: string,
+    newChannel: boolean,
+    name: string
+  ) => void;
   initialChannel?: string;
+  newChannel: boolean;
 }) {
   const [channelType, setChannelType] = useState<"existing" | "new">(
-    initialChannel ? "existing" : "new"
+    newChannel ? "new" : "existing"
   );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newChannelName, setNewChannelName] = useState("");
+  const [newChannelName, setNewChannelName] = useState(initialChannel);
   const [selectedChannel, setSelectedChannel] = useState<string | null>(
     initialChannel || null
   );
+
   const [agreed, setAgreed] = useState(false);
 
-  // Mock channels - in real app, these would come from Slack API
-  const channels = [
-    "general",
-    "random",
-    "team-social",
-    "announcements",
-    "celebrations",
-    "introductions",
-    "discussions",
-  ].filter((channel) =>
-    channel.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { data: channels } = useQuery({
+    queryKey: ["channels", integrationId],
+    queryFn: async () => {
+      const response = await axios.get(`/api/slack/${integrationId}/channels`);
+      const rawData = response.data;
+      const parsedData = slackChannelsResponseSchema.parse(rawData);
+      return parsedData.channels;
+    },
+    staleTime: 1000 * 60 * 10,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
   const details = featureDetails[feature as keyof typeof featureDetails];
 
@@ -75,7 +102,12 @@ export default function OnboardingChannel({
     const channelToUse =
       channelType === "new" ? newChannelName : selectedChannel;
     if (channelToUse) {
-      onSubmit(feature, channelToUse);
+      onSubmit(
+        feature,
+        channelToUse,
+        channelType === "new",
+        channels?.find((value) => value.id === channelToUse)?.name ?? ""
+      );
     }
   };
 
@@ -132,29 +164,32 @@ export default function OnboardingChannel({
               {channelType === "existing" && (
                 <div className="mt-4 ml-6">
                   <div className="relative">
-                    <Input
-                      placeholder="Search your Slack channels..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-white"
-                    />
-                    {channels.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-y-auto z-10">
-                        {channels.map((channel) => (
-                          <button
-                            key={channel}
-                            type="button"
-                            className={cn(
-                              "w-full px-3 py-2 text-left hover:bg-orange-50 transition-colors",
-                              selectedChannel === channel && "bg-orange-100"
-                            )}
-                            onClick={() => setSelectedChannel(channel)}
-                          >
-                            # {channel}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    <Select
+                      onValueChange={(value) => setSelectedChannel(value)}
+                      defaultValue={!newChannel ? initialChannel : undefined}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="select a channel" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {channels?.map((channel) => (
+                            <SelectItem
+                              key={channel.id}
+                              value={channel.id}
+                              className={cn(
+                                "w-full px-3 py-2 text-left hover:bg-orange-50 transition-colors",
+                                selectedChannel === channel.id &&
+                                  "bg-orange-100"
+                              )}
+                              onClick={() => setSelectedChannel(channel.id)}
+                            >
+                              # {channel.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               )}
@@ -169,6 +204,7 @@ export default function OnboardingChannel({
                 <div className="mt-4 ml-6">
                   <Input
                     placeholder="Enter new channel name"
+                    defaultValue={newChannel ? initialChannel : ""}
                     value={newChannelName}
                     onChange={(e) =>
                       setNewChannelName(

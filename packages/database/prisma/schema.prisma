@@ -65,7 +65,8 @@ model Channel {
   id            Int             @id @default(autoincrement())
   publicId      String          @unique @default(nanoid(12))
   active        Boolean         @default(true)
-  channelId     String
+  channelId     String?
+  channelName   String?
   type          ChannelType
   integration   Integration     @relation(fields: [integrationId], references: [id])
   integrationId Int

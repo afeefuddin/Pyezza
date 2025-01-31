@@ -1,13 +1,16 @@
 {
-  "name": "my-monorepo",
+  "name": "pyezza",
   "private": true,
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
+  "prisma": {
+    "schema": "packages/database/schema.prisma"
+  },
   "scripts": {
     "build": "yarn workspaces run build",
-    "dev": "yarn workspace web dev",
+    "dev": "yarn workspace @repo/nextjs dev",
     "build:packages": "yarn workspace @repo/database build",
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",

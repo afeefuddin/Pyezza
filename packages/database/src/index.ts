@@ -1,9 +1,18 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
+import type { Prisma, PrismaClient as PrismaClientType } from "@prisma/client";
 
 declare global {
-  var prisma: PrismaClient | undefined
+  var prisma: PrismaClient | undefined;
 }
 
-export const prisma = global.prisma || new PrismaClient()
+export const prisma = global.prisma || new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') global.prisma = prisma
+type ModelNames = Prisma.ModelName;
+export type PrismaModels = {
+  [M in ModelNames]: Exclude<
+    Awaited<ReturnType<PrismaClientType[Uncapitalize<M>]["findUnique"]>>,
+    null
+  >;
+};
+
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;

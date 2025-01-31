@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
       teamId: data.team.id,
       teamName: data.team.name,
       type: "slack",
+      token: data.access_token,
       botUserId: data.bot_user_id,
       appId: data.app_id,
       scope: data.scope,

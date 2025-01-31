@@ -4,6 +4,7 @@ import { useState } from "react";
 import { UserCircle2, MessageSquare, PartyPopper, Trophy } from "lucide-react";
 import Features from "./components/features";
 import OnboardingChannel from "./components/onboarding-channel";
+import { Button } from "@/components/ui/button";
 
 export interface Feature {
   id: string;
@@ -28,8 +29,8 @@ const features: Feature[] = [
     ],
   },
   {
-    id: "discussions",
-    name: "Discussion Topics",
+    id: "wouldyourather",
+    name: "Would you rather?",
     icon: <MessageSquare className="h-5 w-5" />,
     description: "Keep conversations flowing with curated discussion topics",
     details: [
@@ -40,8 +41,20 @@ const features: Feature[] = [
     ],
   },
   {
-    id: "celebrations",
+    id: "celebration",
     name: "Team Celebrations",
+    icon: <PartyPopper className="h-5 w-5" />,
+    description: "Celebrate important moments and milestones",
+    details: [
+      "Birthday celebrations",
+      "Work anniversaries",
+      "Project completion celebrations",
+      "Personal achievement announcements",
+    ],
+  },
+  {
+    id: "spotlight",
+    name: "Put people in the spot",
     icon: <PartyPopper className="h-5 w-5" />,
     description: "Celebrate important moments and milestones",
     details: [
@@ -69,26 +82,28 @@ const features: Feature[] = [
 interface ChannelConfig {
   feature: string;
   channel: string;
+  new: boolean;
+  name: string;
 }
 
 export default function Onboarding({
   data,
+  integrationId,
 }: {
   data: { teamName: string | null; teamId: string };
+  integrationId: string;
 }) {
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [configuredChannels, setConfiguredChannels] = useState<ChannelConfig[]>(
-    []
-  );
+  const [configuredChannels, setConfiguredChannels] =
+    useState<ChannelConfig | null>(null);
 
-  const handleChannelSelect = (feature: string, channel: string) => {
-    setConfiguredChannels((prev) => {
-      const existing = prev.find((c) => c.feature === feature);
-      if (existing) {
-        return prev.map((c) => (c.feature === feature ? { ...c, channel } : c));
-      }
-      return [...prev, { feature, channel }];
-    });
+  const handleChannelSelect = (
+    feature: string,
+    channel: string,
+    newChannel: boolean,
+    name: string
+  ) => {
+    setConfiguredChannels({ feature, channel, new: newChannel, name });
     setSelectedFeature(null);
   };
 
@@ -114,7 +129,7 @@ export default function Onboarding({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-medium text-orange-700">
+        <h2 className="text-xl font-medium text-primary">
           Choose Your Social Features
         </h2>
         <p className="text-muted-foreground">
@@ -125,29 +140,32 @@ export default function Onboarding({
           </p>
         </p>
       </div>
-      {/* {configuredChannels.length > 0 && (
-        <div className="mb-12">
-          <ConfiguredChannels
-            channels={configuredChannels}
-            onEdit={setSelectedFeature}
-          />
-        </div>
-      )} */}
+
       {!selectedFeature ? (
-        <Features
-          features={features}
-          onSelect={setSelectedFeature}
-          configuredChannels={configuredChannels}
-        />
+        <>
+          <Features
+            features={features}
+            onSelect={setSelectedFeature}
+            configuredChannels={configuredChannels}
+          />
+          <div className="flex justify-end">
+            <Button
+              size="lg"
+              className="text-base font-semibold"
+              disabled={!configuredChannels}
+            >
+              Submit
+            </Button>
+          </div>
+        </>
       ) : (
         <OnboardingChannel
+          integrationId={integrationId ?? ""}
           feature={selectedFeature}
           onBack={() => setSelectedFeature(null)}
           onSubmit={handleChannelSelect}
-          initialChannel={
-            configuredChannels.find((c) => c.feature === selectedFeature)
-              ?.channel
-          }
+          initialChannel={configuredChannels?.channel}
+          newChannel={!!configuredChannels?.new}
         />
       )}
     </div>

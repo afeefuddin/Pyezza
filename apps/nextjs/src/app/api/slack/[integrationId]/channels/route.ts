@@ -39,27 +39,25 @@ export const GET = withError(
 );
 
 const joinChannelRequestSchema = z.object({
-  channels: z.array(
-    z.intersection(
+  channel: z.intersection(
+    z.object({
+      channelType: z.enum([
+        "socialsips",
+        "wouldyourather",
+        "spotlight",
+        "celebration",
+      ]),
+    }),
+    z.discriminatedUnion("new", [
       z.object({
-        channelType: z.enum([
-          "socialsips",
-          "wouldyourather",
-          "spotlight",
-          "celebration",
-        ]),
+        new: z.literal(false),
+        channelId: z.string(),
       }),
-      z.discriminatedUnion("new", [
-        z.object({
-          new: z.literal(false),
-          channelId: z.string(),
-        }),
-        z.object({
-          new: z.literal(true),
-          channelName: z.string(),
-        }),
-      ])
-    )
+      z.object({
+        new: z.literal(true),
+        channelName: z.string(),
+      }),
+    ])
   ),
 });
 
@@ -69,9 +67,19 @@ async function createChannel(
   type: "socialsips" | "wouldyourather" | "spotlight" | "celebration",
   integrationId: number
 ): Promise<boolean> {
-  let data;
+  let data:
+    | {
+        ok: true;
+        channel: {
+          id: string;
+        };
+      }
+    | {
+        error: string;
+        ok: false;
+      };
+
   try {
-    // create channel entry
     const channel = await prisma.channel.create({
       data: {
         type,
@@ -81,30 +89,54 @@ async function createChannel(
       },
     });
 
-    // call the slack api
+
     data = await slackApi.createChannel(channelName);
 
-    if (data.ok) {
-      await prisma.channel.update({
-        where: {
-          id: channel.id,
-          active: true,
-        },
-        data: {
-          channelId: data.channel_id,
-        },
-      });
-    } else {
-      await prisma.channel.delete({
-        where: {
-          id: channel.id,
-        },
-      });
-    }
-  } catch {
+    await prisma.$transaction(async (prisma) => {
+      if (data.ok) {
+        await prisma.channel.update({
+          where: {
+            id: channel.id,
+          },
+          data: {
+            active: true,
+            channelId: data.channel.id,
+          },
+        });
+
+        const integration = await prisma.integration.findUnique({
+          where: {
+            id: integrationId,
+          },
+          include: {
+            channels: true,
+          },
+        });
+
+        if (integration?.channels.length && !integration.onboardingCompleted) {
+          await prisma.integration.update({
+            where: {
+              id: integrationId,
+            },
+            data: {
+              onboardingCompleted: true,
+            },
+          });
+        }
+      } else {
+        await prisma.channel.delete({
+          where: {
+            id: channel.id,
+          },
+        });
+      }
+    });
+
+    return data.ok;
+  } catch (error) {
+    console.error("Error creating channel:", error);
     return false;
   }
-  return true;
 }
 
 async function joinChannel(
@@ -112,10 +144,21 @@ async function joinChannel(
   channelId: string,
   type: "socialsips" | "wouldyourather" | "spotlight" | "celebration",
   integrationId: number
-) {
-  let data;
+): Promise<boolean> {
+  let data:
+    | {
+        channel: {
+          id: string;
+          name: string;
+        };
+        ok: true;
+      }
+    | {
+        error: string;
+        ok: false;
+      };
+
   try {
-    // create channel entry
     const channel = await prisma.channel.create({
       data: {
         type,
@@ -125,35 +168,59 @@ async function joinChannel(
       },
     });
 
-    // call the slack api
-    data = await slackApi.joinChannel(channelId);
+    console.log("Created channel entry:", channel);
 
-    if (data.ok) {
-      await prisma.channel.update({
-        where: {
-          id: channel.id,
-          active: true,
-        },
-        data: {
-          channelId: data.channel.name,
-        },
-      });
-    } else {
-      await prisma.channel.delete({
-        where: {
-          id: channel.id,
-        },
-      });
-    }
-  } catch {
+    data = await slackApi.joinChannel(channelId);
+    console.log("Slack API response:", data);
+
+    await prisma.$transaction(async (prisma) => {
+      if (data.ok) {
+        await prisma.channel.update({
+          where: {
+            id: channel.id,
+          },
+          data: {
+            active: true,
+            channelId: data.channel.id,
+          },
+        });
+
+        const integration = await prisma.integration.findUnique({
+          where: {
+            id: integrationId,
+          },
+          include: { channels: true },
+        });
+
+        if (integration?.channels.length && !integration.onboardingCompleted) {
+          await prisma.integration.update({
+            where: {
+              id: integrationId,
+            },
+            data: {
+              onboardingCompleted: true,
+            },
+          });
+        }
+      } else {
+        await prisma.channel.delete({
+          where: {
+            id: channel.id,
+          },
+        });
+      }
+    });
+
+    return data.ok;
+  } catch (error) {
+    console.error("Error joining channel:", error);
     return false;
   }
-  return true;
 }
 
 export const POST = withError(
   withUser(async (req, { params }) => {
-    const integrationId = params.integrationId;
+    const integrationId = (await params).integrationId;
     if (!integrationId) {
       return NextResponse.json(
         { msg: "integrationId is required" },
@@ -178,59 +245,29 @@ export const POST = withError(
       });
     }
 
-    const created: string[] = [];
-    const errors: string[] = [];
-
     const rawData = await req.json();
     const parsedData = joinChannelRequestSchema.parse(rawData);
 
     const slackapi = new SlackApi(integration.token);
 
-    /* 
-      There can be two possibilites here
-      [
-        {
-          channelType: ,
-          channelId: // can be a new channel,
-        }
-      ]
-      // we have to define a service to set the channel settings different types of channels
-    */
+    const c = parsedData.channel;
+    let response: boolean;
+    if (c.new) {
+      response = await createChannel(
+        slackapi,
+        c.channelName,
+        c.channelType,
+        integration.id
+      );
+    } else {
+      response = await joinChannel(
+        slackapi,
+        c.channelId,
+        c.channelType,
+        integration.id
+      );
+    }
 
-    await Promise.all(
-      parsedData.channels.map(async (c) => {
-        if (c.new) {
-          const response = await createChannel(
-            slackapi,
-            c.channelName,
-            c.channelType,
-            integration.id
-          );
-          if (response) {
-            created.push(c.channelName);
-          } else {
-            errors.push(c.channelName);
-          }
-        } else {
-          const response = await joinChannel(
-            slackapi,
-            c.channelId,
-            c.channelType,
-            integration.id
-          );
-          if (response) {
-            created.push(c.channelId);
-          } else {
-            errors.push(c.channelId);
-          }
-        }
-      })
-    );
-    return NextResponse.json({
-      created,
-      errors,
-    });
-    // const channels = await slackapi.getChannels()
-    // return NextResponse.json({channels})
+    return NextResponse.json({ response });
   })
 );

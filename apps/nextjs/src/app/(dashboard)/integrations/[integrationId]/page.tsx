@@ -1,5 +1,6 @@
 import { getIntegration } from "@/actions/integration";
 import Onboarding from "./onboarding";
+import Home from "./home";
 
 export default async function Page({
   params,
@@ -13,7 +14,11 @@ export default async function Page({
   }
   return (
     <div className="p-8 md:p-16 w-full  overflow-y-auto">
-      <Onboarding data={data} integrationId={integrationId} />
+      {data.onboardingCompleted ? (
+        <Home data={data} />
+      ) : (
+        <Onboarding data={data} integrationId={integrationId} />
+      )}
     </div>
   );
 }

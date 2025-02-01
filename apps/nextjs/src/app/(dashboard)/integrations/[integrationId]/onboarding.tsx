@@ -5,6 +5,8 @@ import { UserCircle2, MessageSquare, PartyPopper, Trophy } from "lucide-react";
 import Features from "./components/features";
 import OnboardingChannel from "./components/onboarding-channel";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 export interface Feature {
   id: string;
@@ -96,6 +98,43 @@ export default function Onboarding({
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [configuredChannels, setConfiguredChannels] =
     useState<ChannelConfig | null>(null);
+  const { mutate: submit } = useMutation({
+    mutationKey: ["create-channel"],
+    mutationFn: async () => {
+      if (!configuredChannels) return;
+      const body:
+        | {
+            new: true;
+            channelName?: string;
+            channelType: string;
+          }
+        | {
+            new: false;
+            channelId?: string;
+            channelType: string;
+          } = {
+        new: configuredChannels.new === true,
+        channelType: configuredChannels.feature,
+      };
+
+      if (body["new"]) {
+        body["channelName"] = configuredChannels.channel;
+      } else {
+        body["channelId"] = configuredChannels.channel;
+      }
+
+      const response = await axios.post(
+        `/api/slack/${integrationId}/channels`,
+        {
+          channel: body,
+          onboarding: true,
+        }
+      );
+
+      const data = response.data;
+      return data;
+    },
+  });
 
   const handleChannelSelect = (
     feature: string,
@@ -153,6 +192,7 @@ export default function Onboarding({
               size="lg"
               className="text-base font-semibold"
               disabled={!configuredChannels}
+              onClick={() => submit()}
             >
               Submit
             </Button>

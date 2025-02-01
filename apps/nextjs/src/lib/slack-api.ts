@@ -27,9 +27,12 @@ const slackJoinChannelResponseSchema = z.discriminatedUnion("ok", [
 export class SlackApi {
   token: string;
   url = "https://slack.com/api";
+  formData;
 
   constructor(token: string) {
     this.token = token;
+    this.formData = new FormData();
+    this.formData.set("token", this.token);
   }
 
   // TODO: Cache response for 10 minutes to avoid rate limiting
@@ -48,11 +51,7 @@ export class SlackApi {
   async joinChannel(channelId: string) {
     const response = await axios.post(
       `${this.url}/conversations.join?channel=${channelId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      }
+      this.formData
     );
     const rawData = response.data;
     const parsedData = slackJoinChannelResponseSchema.parse(rawData);
@@ -61,19 +60,18 @@ export class SlackApi {
 
   async createChannel(name: string) {
     const response = await axios.post(
-      `${this.url}/conversations.create?is_private=false&name=${name}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      }
+      `${this.url}/conversations.create?name=${name}`,
+      this.formData
     );
     const rawData = response.data;
+    console.log(rawData);
     const parsedData = z
       .discriminatedUnion("ok", [
         z.object({
           ok: z.literal(true),
-          channel_id: z.string(),
+          channel: z.object({
+            id: z.string(),
+          }),
         }),
         z.object({
           ok: z.literal(false),

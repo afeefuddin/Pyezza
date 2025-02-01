@@ -26,6 +26,13 @@ export async function getIntegration(publicId: string) {
         user: user,
         publicId: publicId,
       },
+      include: {
+        channels: {
+          where: {
+            active: true,
+          },
+        },
+      },
     });
     return resposne;
   } catch {

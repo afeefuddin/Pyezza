@@ -25,7 +25,6 @@ export  async function getUser() {
       },
     });
 
-    console.log("no data found");
     return data;
   } catch (error) {
     console.log(error);

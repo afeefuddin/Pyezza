@@ -25,6 +25,21 @@ enum ChannelType {
   celebration
 }
 
+enum MessageTemplateTags {
+  fun
+  hypothetical
+  food
+  cars
+  games
+  aspirational
+}
+
+enum MessageTemplateType {
+  socialsips
+  wouldyourather
+  spotlight
+}
+
 model User {
   id                 Int           @id @default(autoincrement())
   email              String        @unique
@@ -52,13 +67,13 @@ model Integration {
 }
 
 model ChannelSetting {
-  id         Int      @id @default(autoincrement())
-  timezone   String   @default("Asia/Kolkata")
-  timeOfday  Int      @default(36000)
-  channel    Channel  @relation(fields: [channelId], references: [id])
-  channelId  Int      @unique
-  everyNWeek Int      @default(1)
-  daysOfWeek String[] @default(["Monday", "Wednesday", "Friday"])
+  id         Int     @id @default(autoincrement())
+  timezone   String  @default("Asia/Kolkata")
+  timeOfday  Int     @default(36000)
+  channel    Channel @relation(fields: [channelId], references: [id])
+  channelId  Int     @unique
+  everyNWeek Int     @default(1)
+  daysOfWeek Int[]   @default([0, 2, 4])
 }
 
 model Channel {
@@ -71,4 +86,28 @@ model Channel {
   integration   Integration     @relation(fields: [integrationId], references: [id])
   integrationId Int
   setting       ChannelSetting?
+  Message       Message[]
+}
+
+model MessageTemplate {
+  id        Int                   @id @default(autoincrement())
+  publicId  String                @unique @default(nanoid(12))
+  content   String
+  gif       String?
+  type      MessageTemplateType
+  topic     MessageTemplateTags[]
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  Message   Message[]
+}
+
+model Message {
+  id                Int             @id @default(autoincrement())
+  channelId         Int
+  channel           Channel         @relation(fields: [channelId], references: [id])
+  templateId        Int
+  template          MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  messageTemplateId Int
 }

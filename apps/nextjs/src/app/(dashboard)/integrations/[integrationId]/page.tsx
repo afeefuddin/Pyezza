@@ -13,7 +13,7 @@ export default async function Page({
     return <div>Page not found</div>;
   }
   return (
-    <div className="p-8 md:p-16 w-full  overflow-y-auto">
+    <div className="p-4 sm:p-8 md:p-16 w-full  overflow-y-auto">
       {data.onboardingCompleted ? (
         <Home data={data} />
       ) : (

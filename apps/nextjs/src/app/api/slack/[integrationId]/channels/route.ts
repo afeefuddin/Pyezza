@@ -89,7 +89,6 @@ async function createChannel(
       },
     });
 
-
     data = await slackApi.createChannel(channelName);
 
     await prisma.$transaction(async (prisma) => {

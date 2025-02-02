@@ -43,6 +43,7 @@ export function withError(handler: NextHandler): NextHandler {
           { status: 400 }
         );
       }
+      console.log(err)
       return NextResponse.json(
         { error: "An unexpected error occurred" },
         { status: 500 }

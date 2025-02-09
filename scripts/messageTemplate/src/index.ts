@@ -33,7 +33,7 @@ async function main() {
     let type: TMessageTemplate["type"];
     const typeInput = await question(`Enter message type : `);
 
-    type = typeInput.toUpperCase() as TMessageTemplate["type"];
+    type = typeInput as TMessageTemplate["type"];
 
     let content: string;
     while (true) {

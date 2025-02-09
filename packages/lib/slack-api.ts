@@ -86,7 +86,7 @@ export class SlackApi {
     this.formData.set("text", value);
     this.formData.set("channel", channelId);
     const response = await axios.post(
-      `${this.url}/conversations.create?name=${name}`,
+      `${this.url}/chat.postMessage`,
       this.formData
     );
     const rawData = response.data;

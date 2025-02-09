@@ -61,7 +61,7 @@ function filterChannels(
   return filterChannels;
 }
 
-const sendSlackMessage = task({
+export const sendSlackMessage = task({
   id: "send-message-slack",
   run: async (payload: { id: number; messageId: number }) => {
     const channel = await prisma.channel.findUnique({
@@ -119,7 +119,7 @@ const sendSlackMessage = task({
   },
 });
 
-const sendMessageTask = task({
+export const sendMessageTask = task({
   id: "send-message",
   run: async (payload: { id: number }) => {
     const { id } = payload;

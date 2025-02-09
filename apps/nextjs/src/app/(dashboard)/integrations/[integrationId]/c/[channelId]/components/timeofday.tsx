@@ -1,8 +1,6 @@
 import { Label } from "@/components/ui/label";
-import { TimePeriodSelect } from "@/components/ui/period-select";
 
 import { TimePickerInput } from "@/components/ui/time-picker";
-import { Period } from "@/components/ui/time-picker-utils";
 import React from "react";
 
 export function TimeOfDay({
@@ -12,7 +10,6 @@ export function TimeOfDay({
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
 }) {
-  const [period, setPeriod] = React.useState<Period>("PM");
 
   const minuteRef = React.useRef<HTMLInputElement>(null);
   const hourRef = React.useRef<HTMLInputElement>(null);
@@ -25,8 +22,7 @@ export function TimeOfDay({
           Hours
         </Label>
         <TimePickerInput
-          picker="12hours"
-          period={period}
+          picker="hours"
           date={date}
           setDate={setDate}
           ref={hourRef}
@@ -59,19 +55,6 @@ export function TimeOfDay({
           ref={secondRef}
           onLeftFocus={() => minuteRef.current?.focus()}
           onRightFocus={() => periodRef.current?.focus()}
-        />
-      </div>
-      <div className="grid gap-1 text-center">
-        <Label htmlFor="period" className="text-xs">
-          Period
-        </Label>
-        <TimePeriodSelect
-          period={period}
-          setPeriod={setPeriod}
-          date={date}
-          setDate={setDate}
-          ref={periodRef}
-          onLeftFocus={() => secondRef.current?.focus()}
         />
       </div>
     </div>

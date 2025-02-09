@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { slackChannelsResponseSchema } from "@/lib/slack-api";
+import { slackChannelsResponseSchema } from "@repo/lib/slack-api";
 import {
   Select,
   SelectGroup,

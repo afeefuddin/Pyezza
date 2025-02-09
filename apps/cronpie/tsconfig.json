@@ -1,15 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "lib": ["es2017", "esnext.asynciterable"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "moduleResolution": "Bundler"
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "trigger.config.ts"
+  ],
   "exclude": ["node_modules"]
 }

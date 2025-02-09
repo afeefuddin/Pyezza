@@ -81,4 +81,18 @@ export class SlackApi {
       .parse(rawData);
     return parsedData;
   }
+
+  async sendMessage(value: string, channelId: string) {
+    this.formData.set("text", value);
+    this.formData.set("channel", channelId);
+    const response = await axios.post(
+      `${this.url}/conversations.create?name=${name}`,
+      this.formData
+    );
+    const rawData = response.data;
+
+    const parsedData = z.object({ ok: z.boolean() }).parse(rawData);
+
+    return parsedData;
+  }
 }

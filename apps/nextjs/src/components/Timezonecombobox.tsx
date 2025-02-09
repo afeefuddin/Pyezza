@@ -29,7 +29,7 @@ export function TimezoneComboBox({ value, onChange }: TimezoneComboBoxProps) {
   const [open, setOpen] = React.useState(false);
 
   // Find the current timezone option
-  const currentTimezone = timezoneOptions.find((tz) => tz.value === value);
+  const currentTimezone = timezoneOptions[value];
 
   // Optionally, compute the offset string dynamically.
   let dynamicOffset = "";
@@ -65,19 +65,19 @@ export function TimezoneComboBox({ value, onChange }: TimezoneComboBoxProps) {
           <CommandEmpty>No timezone found.</CommandEmpty>
           <CommandGroup className="max-h-96 overflow-auto">
             <CommandList>
-              {timezoneOptions.map((tz) => (
+              {Object.entries(timezoneOptions).map(([key, tz]) => (
                 <CommandItem
-                  key={tz.value}
+                  key={key}
                   value={`${tz.label} ${tz.zones.join(" ")}`}
                   onSelect={() => {
-                    onChange(tz.value);
+                    onChange(key);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === tz.value ? "opacity-100" : "opacity-0"
+                      value === key ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div>

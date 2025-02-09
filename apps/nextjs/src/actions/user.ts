@@ -5,7 +5,6 @@ import { prisma } from "@repo/database";
 export  async function getUser() {
   const clerkUser = await currentUser();
   if (!clerkUser) {
-    console.log("no clerk user");
     return null;
   }
   try {

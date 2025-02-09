@@ -13,7 +13,7 @@ import { DaysOfTheWeek } from "./components/daysoftheweek";
 import { EveryNWeekSelect } from "./components/everynweekselect";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { secondToDate } from "@/lib/date";
+import { secondToDate } from "@repo/lib/date";
 import { useRouter } from "next/navigation";
 
 export default function Settings({

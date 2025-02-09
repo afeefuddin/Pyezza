@@ -40,6 +40,12 @@ enum MessageTemplateType {
   spotlight
 }
 
+enum MessageStatus {
+  PENDING
+  CANCELLED
+  SENT
+}
+
 model User {
   id                 Int           @id @default(autoincrement())
   email              String        @unique
@@ -99,15 +105,16 @@ model MessageTemplate {
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
   Message   Message[]
+  active    Boolean               @default(true)
 }
 
 model Message {
   id                Int             @id @default(autoincrement())
   channelId         Int
   channel           Channel         @relation(fields: [channelId], references: [id])
-  templateId        Int
   template          MessageTemplate @relation(fields: [messageTemplateId], references: [id])
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   messageTemplateId Int
+  status            MessageStatus   @default(PENDING)
 }

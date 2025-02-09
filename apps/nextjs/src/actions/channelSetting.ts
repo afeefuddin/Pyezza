@@ -1,5 +1,6 @@
 "use server";
 
+import { convertToLocal } from "@/lib/timezone";
 import { prisma } from "@repo/database";
 
 export async function getChannelSettings(channelId: string) {
@@ -45,5 +46,6 @@ export async function getChannelSettings(channelId: string) {
       },
     },
   });
+
   return data;
 }

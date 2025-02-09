@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { TChannelSetting } from "@repo/types/channelSetting";
 
 import { prisma } from "@repo/database";
-import { dateToSeconds } from "@/lib/date";
+import { dateToSeconds } from "@repo/lib/date";
 
 const updateSettingApiSchema = z.object({
   everyNWeek: z.number().optional(),
@@ -19,6 +19,32 @@ export const PUT = withError(
     const { integrationId, channelId } = await params.params;
     const rawData = await req.json();
     const data = updateSettingApiSchema.parse(rawData);
+
+    const channel = await prisma.channel.findFirst({
+      where: {
+        publicId: channelId,
+        integration: {
+          publicId: integrationId,
+          user: {
+            id: req.user.id,
+          },
+        },
+      },
+    });
+
+    if (!channel) {
+      return NextResponse.json({ error: "Channel Not found" }, { status: 404 });
+    }
+
+    const channelSetting = await prisma.channelSetting.upsert({
+      where: {
+        channelId: channel.id,
+      },
+      create: {
+        channelId: channel.id,
+      },
+      update: {},
+    });
 
     const updateData: Partial<TChannelSetting> = {};
     if (timezonePresent(data.timezone)) {
@@ -34,29 +60,12 @@ export const PUT = withError(
     }
 
     if (data.timeOfTheDay) {
-      updateData["timeOfday"] = dateToSeconds(new Date(data.timeOfTheDay));
-    }
-
-    console.log(channelId, integrationId, req.user);
-
-    const channel = await prisma.channel.findFirst({
-      where: {
-        publicId: channelId,
-        integration: {
-          publicId: integrationId,
-          user: {
-            id: req.user.id,
-          },
-        },
-      },
-    });
-    if (!channel) {
-      return NextResponse.json({ error: "Channel Not found" }, { status: 404 });
+      updateData["timeOfday"] = dateToSeconds(new Date(data.timeOfTheDay))
     }
 
     await prisma.channelSetting.update({
       where: {
-        channelId: channel.id,
+        id: channelSetting.id,
       },
       data: {
         ...updateData,

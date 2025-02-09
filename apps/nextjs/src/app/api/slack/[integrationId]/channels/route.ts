@@ -1,7 +1,7 @@
 import { withError, withUser } from "@/lib/middleware";
 import { NextResponse } from "next/server";
 import { prisma } from "@repo/database";
-import { SlackApi } from "@/lib/slack-api";
+import { SlackApi } from "@repo/lib/slack-api";
 import { z } from "zod";
 
 export const GET = withError(
@@ -167,10 +167,7 @@ async function joinChannel(
       },
     });
 
-    console.log("Created channel entry:", channel);
-
     data = await slackApi.joinChannel(channelId);
-    console.log("Slack API response:", data);
 
     await prisma.$transaction(async (prisma) => {
       if (data.ok) {

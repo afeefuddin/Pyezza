@@ -49,11 +49,10 @@ export class SlackOauth {
         },
       });
       const data = response.data;
-      console.log(data)
       const parsedData = SlackOauth.slackResponseSchema.parse(data);
       return parsedData;
     } catch {
-      console.log("error here")
+      console.log("error here");
       return null;
     }
   }

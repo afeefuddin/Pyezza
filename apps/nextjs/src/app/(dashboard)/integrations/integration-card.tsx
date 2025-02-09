@@ -45,7 +45,6 @@ export default function IntegrationCard({
     publicId: string;
   };
 }) {
-  console.log(data);
   const random = Math.floor(Math.random() * 10) % Backgrounds.length;
   return (
     <div className="h-72 bg-muted rounded-lg">

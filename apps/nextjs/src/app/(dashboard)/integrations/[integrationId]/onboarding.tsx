@@ -1,6 +1,6 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import React, { useState } from "react";
 import { UserCircle2, MessageSquare, PartyPopper, Trophy } from "lucide-react";
 import Features from "./components/features";
 import OnboardingChannel from "./components/onboarding-channel";
@@ -91,9 +91,11 @@ interface ChannelConfig {
 export default function Onboarding({
   data,
   integrationId,
+  children,
 }: {
   data: { teamName: string | null; teamId: string };
   integrationId: string;
+  children: React.ReactNode;
 }) {
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [configuredChannels, setConfiguredChannels] =
@@ -148,14 +150,7 @@ export default function Onboarding({
 
   return (
     <div className="flex flex-col gap-4 ">
-      <div className="flex flex-col gap-2 ">
-        <div className=" text-lg md:text-2xl text-primary font-bold">
-          Yay you added Pyezza to {data.teamName ?? data.teamId}
-        </div>
-        <div className="text-base md:text-xl font-semibold text-secondary ">
-          Let's Finish Onboarding
-        </div>
-      </div>
+      <div className="flex flex-col gap-2 ">{children}</div>
       <Separator />
       <div className="text-lg text-muted-foreground">
         <div className="text-lg">

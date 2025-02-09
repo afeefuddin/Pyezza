@@ -4,13 +4,12 @@ import { TimezoneComboBox } from "@/components/Timezonecombobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { TChannelSetting } from "@repo/types/channelSetting";
-import { Calendar, Clock, Earth, RotateCw } from "lucide-react";
+import { Calendar, Clock, Earth } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TimeOfDay } from "./components/timeofday";
 import { DaysOfTheWeek } from "./components/daysoftheweek";
-import { EveryNWeekSelect } from "./components/everynweekselect";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { secondToDate } from "@repo/lib/date";
@@ -29,7 +28,6 @@ export default function Settings({
   } & Partial<TChannelSetting>;
   integrationId: string;
 }) {
-  const [everyNWeek, setEveryNWeek] = useState(data.everyNWeek ?? 0);
   const [daysOfTheWeek, setDaysOfTheWeek] = useState(data.daysOfWeek ?? []);
   const [timeOfTheDay, setTimeOfTheDay] = useState<Date | undefined>(
     data.timeOfday ? secondToDate(data.timeOfday) : undefined
@@ -43,7 +41,6 @@ export default function Settings({
     mutationKey: ["update-channel-settings"],
     mutationFn: async () => {
       const body = {
-        everyNWeek,
         daysOfTheWeek,
         timeOfTheDay,
         timezone,
@@ -104,7 +101,7 @@ export default function Settings({
             <TimeOfDay date={timeOfTheDay} setDate={setTimeOfTheDay} />
           </div>
 
-          <div className="grid grid-cols-8 items-center">
+          {/* <div className="grid grid-cols-8 items-center">
             <RotateCw size={30} className="text-muted-foreground" />
             <div className="col-span-3">
               <div>Every N week</div>
@@ -113,7 +110,7 @@ export default function Settings({
               </div>
             </div>
             <EveryNWeekSelect setValue={setEveryNWeek} value={everyNWeek} />
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-8 items-center">
             <Earth size={30} className="text-muted-foreground" />

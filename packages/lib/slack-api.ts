@@ -91,7 +91,17 @@ export class SlackApi {
     );
     const rawData = response.data;
 
-    const parsedData = z.object({ ok: z.boolean() }).parse(rawData);
+    const parsedData = z
+      .discriminatedUnion("ok", [
+        z.object({
+          ok: z.literal(true),
+        }),
+        z.object({
+          ok: z.literal(false),
+          error: z.string(),
+        }),
+      ])
+      .parse(rawData);
 
     return parsedData;
   }

@@ -8,7 +8,6 @@ import { prisma } from "@repo/database";
 import { dateToSeconds } from "@repo/lib/date";
 
 const updateSettingApiSchema = z.object({
-  everyNWeek: z.number().optional(),
   daysOfTheWeek: z.array(z.number()).optional(),
   timeOfTheDay: z.string().optional(),
   timezone: z.string(),
@@ -55,12 +54,8 @@ export const PUT = withError(
       updateData["daysOfWeek"] = data.daysOfTheWeek;
     }
 
-    if (data.everyNWeek) {
-      updateData["everyNWeek"] = data.everyNWeek;
-    }
-
     if (data.timeOfTheDay) {
-      updateData["timeOfday"] = dateToSeconds(new Date(data.timeOfTheDay))
+      updateData["timeOfday"] = dateToSeconds(new Date(data.timeOfTheDay));
     }
 
     await prisma.channelSetting.update({

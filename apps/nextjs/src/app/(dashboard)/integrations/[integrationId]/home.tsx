@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { TIntegrationWithChannels } from "@repo/types/integration";
 import { Settings } from "lucide-react";
@@ -37,7 +38,12 @@ function ChannelCard({
 export default function Home({ data }: { data: TIntegrationWithChannels }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-xl">Your Channels</div>
+      <div className="flex justify-between">
+        <div className="text-xl font-bold">Your Channels</div>
+        <Link href={`/integrations/${data.publicId}/new`}>
+          <Button>Add channel</Button>
+        </Link>
+      </div>
       <div className="lg:grid lg:grid-cols-2">
         {data.channels.length > 0 ? (
           <div>

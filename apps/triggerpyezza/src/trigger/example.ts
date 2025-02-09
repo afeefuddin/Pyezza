@@ -99,10 +99,14 @@ export const sendSlackMessage = task({
     }
 
     const slackApi = new SlackApi(channel.integration.token);
-    await slackApi.sendMessage(
+    const messageSlack = await slackApi.sendMessage(
       message.template.content,
       message.channel.channelId
     );
+
+    if (!messageSlack.ok) {
+      throw new Error("Error message seding failed: " + messageSlack.error);
+    }
 
     try {
       await prisma.message.update({

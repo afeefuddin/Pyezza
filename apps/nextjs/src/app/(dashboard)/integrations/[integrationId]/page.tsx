@@ -17,7 +17,14 @@ export default async function Page({
       {data.onboardingCompleted ? (
         <Home data={data} />
       ) : (
-        <Onboarding data={data} integrationId={integrationId} />
+        <Onboarding data={data} integrationId={integrationId}>
+          <div className=" text-lg md:text-2xl text-primary font-bold">
+            Yay you added Pyezza to {data.teamName ?? data.teamId}
+          </div>
+          <div className="text-base md:text-xl font-semibold text-secondary ">
+            Let's Finish Onboarding
+          </div>
+        </Onboarding>
       )}
     </div>
   );

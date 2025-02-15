@@ -1,4 +1,5 @@
 "use client";
+
 import { Separator } from "@/components/ui/separator";
 import React, { useState } from "react";
 import { MessageSquare, PartyPopper, LoaderCircle } from "lucide-react";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export interface Feature {
   id: string;
@@ -117,7 +119,8 @@ export default function Onboarding({
       );
 
       const data = response.data;
-      router.push(`/integrations/${integrationId}`);
+      revalidatePath(`/integrations/${integrationId}`);
+      router.replace(`/integrations/${integrationId}`);
       return data;
     },
   });

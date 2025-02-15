@@ -5,20 +5,20 @@ import { getUser } from "@/actions/user";
 
 export type NextHandler = (
   req: NextRequest,
-  { params }: { params: Record<string, string | undefined> }
+  { params }: { params: Promise<Record<string, string | undefined>> }
 ) => Promise<NextResponse | Response>;
 
 export type NextRequestWithUser = NextRequest & { user: User };
 
 export type NextHandlerWithUser = (
   req: NextRequestWithUser,
-  params: { params: Record<string, string | undefined> }
+  params: { params: Promise<Record<string, string | undefined>> }
 ) => Promise<NextResponse | Response>;
 
 export function withUser(handler: NextHandlerWithUser) {
   return async (
     req: NextRequest,
-    params: { params: Record<string, string | undefined> }
+    params: { params: Promise<Record<string, string | undefined>> }
   ) => {
     const user = await getUser();
 
@@ -43,7 +43,7 @@ export function withError(handler: NextHandler): NextHandler {
           { status: 400 }
         );
       }
-      console.log(err)
+      console.log(err);
       return NextResponse.json(
         { error: "An unexpected error occurred" },
         { status: 500 }

@@ -1,9 +1,14 @@
-"use server"
+"use server";
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@repo/database";
 
-export  async function getUser() {
-  const clerkUser = await currentUser();
+export async function getUser() {
+  let clerkUser;
+  try {
+    clerkUser = await currentUser();
+  } catch (error) {
+    clerkUser = undefined;
+  }
   if (!clerkUser) {
     return null;
   }

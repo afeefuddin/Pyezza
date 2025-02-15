@@ -4,16 +4,17 @@ import { TimezoneComboBox } from "@/components/Timezonecombobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { TChannelSetting } from "@repo/types/channelSetting";
-import { Calendar, Clock, Earth } from "lucide-react";
+import { Calendar, Clock, Earth, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TimeOfDay } from "./components/timeofday";
 import { DaysOfTheWeek } from "./components/daysoftheweek";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { secondToDate } from "@repo/lib/date";
 import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export default function Settings({
   data,
@@ -37,7 +38,7 @@ export default function Settings({
   );
   const router = useRouter();
 
-  const { mutate: submit } = useMutation({
+  const { mutate: submit, isPending } = useMutation({
     mutationKey: ["update-channel-settings"],
     mutationFn: async () => {
       const body = {
@@ -51,6 +52,7 @@ export default function Settings({
       );
     },
     onSuccess() {
+      router.refresh();
       router.push(`/integrations/${integrationId}`);
     },
   });
@@ -124,7 +126,17 @@ export default function Settings({
             <Link href={`/integrations/${integrationId}`}>
               <Button variant="link">Cancel</Button>
             </Link>
-            <Button onClick={() => submit()}>Save</Button>
+            <Button disabled={isPending} onClick={() => submit()}>
+              {isPending && (
+                <LoaderCircle
+                  className="-ms-1 me-2 animate-spin"
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+              )}
+              Save
+            </Button>
           </div>
         </>
       )}

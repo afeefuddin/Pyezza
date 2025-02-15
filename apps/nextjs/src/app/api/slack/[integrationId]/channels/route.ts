@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const GET = withError(
   withUser(async (req, { params }) => {
-    const integrationId = params.integrationId;
+    const integrationId = (await params).integrationId;
     if (!integrationId) {
       return NextResponse.json(
         { msg: "integrationId is required" },
@@ -87,7 +87,7 @@ async function createChannel(
         channelName,
         active: false,
         setting: {
-          create: true,
+          create: {},
         },
       },
     });
@@ -136,7 +136,7 @@ async function createChannel(
 
     return data.ok;
   } catch (error) {
-    console.error("Error creating channel:", error);
+    console.log("Error creating channel:", error);
     return false;
   }
 }
@@ -168,7 +168,7 @@ async function joinChannel(
         channelId,
         active: false,
         setting: {
-          create: true,
+          create: {},
         },
       },
     });
@@ -216,7 +216,7 @@ async function joinChannel(
 
     return data.ok;
   } catch (error) {
-    console.error("Error joining channel:", error);
+    console.log("Error joining channel:" + error);
     return false;
   }
 }
@@ -262,7 +262,7 @@ export const POST = withError(
         c.channelType,
         integration.id
       );
-    } else {
+    } else if (!c.new) {
       response = await joinChannel(
         slackapi,
         c.channelId,

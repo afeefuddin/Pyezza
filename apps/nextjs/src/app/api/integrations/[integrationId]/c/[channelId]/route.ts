@@ -1,6 +1,6 @@
 import { withError, withUser } from "@/lib/middleware";
 import { timezonePresent } from "@/lib/timezone";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import type { TChannelSetting } from "@repo/types/channelSetting";
 
@@ -13,9 +13,14 @@ const updateSettingApiSchema = z.object({
   timezone: z.string(),
 });
 
+type Params = {
+  integrationId: string;
+  channelId: string;
+};
+
 export const PUT = withError(
   withUser(async (req, params) => {
-    const { integrationId, channelId } = await params.params;
+    const { integrationId, channelId } = (await params.params) as Params;
     const rawData = await req.json();
     const data = updateSettingApiSchema.parse(rawData);
 

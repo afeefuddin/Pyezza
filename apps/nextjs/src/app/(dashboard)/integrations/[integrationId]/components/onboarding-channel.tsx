@@ -204,7 +204,7 @@ export default function OnboardingChannel({
                 <div className="mt-4 ml-6">
                   <Input
                     placeholder="Enter new channel name"
-                    defaultValue={newChannel ? initialChannel : ""}
+                    defaultValue={newChannel ? newChannelName : ""}
                     value={newChannelName}
                     onChange={(e) =>
                       setNewChannelName(

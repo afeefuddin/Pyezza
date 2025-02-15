@@ -1,6 +1,12 @@
 import { prisma } from "@repo/database";
 import { logger, schedules, task, wait } from "@trigger.dev/sdk/v3";
-import { TChannelWithSettingAndMessage } from "@repo/types/channel";
+import {
+  TChannel,
+  TChannelWithIntegration,
+  TChannelWithSettingAndMessage,
+} from "@repo/types/channel";
+import { TMessage } from "@repo/types/message";
+import { TMessageTemplate } from "@repo/types/messageTemplate";
 import { dateToSeconds } from "@repo/lib/date";
 import { SlackApi } from "@repo/lib/slack-api";
 
@@ -39,8 +45,10 @@ function filterChannels(
           timeZone: timezone,
         })
       );
+      const dupDate = new Date(date);
       if (
-        lastMessageDateLocal.setHours(0, 0, 0, 0) === date.setHours(0, 0, 0, 0)
+        lastMessageDateLocal.setHours(0, 0, 0, 0) ===
+        dupDate.setHours(0, 0, 0, 0)
       ) {
         return;
       }
@@ -51,7 +59,13 @@ function filterChannels(
     const endTime = channel.setting.timeOfday + 15 * 60;
     const currentTime = dateToSeconds(date);
     if (currentTime < startTime || currentTime > endTime) {
-      console.log("Did not match the time");
+      console.log(
+        "Did not match the time",
+        date,
+        currentTime,
+        startTime,
+        endTime
+      );
       return;
     }
 
@@ -61,27 +75,161 @@ function filterChannels(
   return filterChannels;
 }
 
+const buildSpotlightSlackMessage = (content, userId) => {
+  const blocks = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `🌟 The Spotlight is on <@${userId}>🌟`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: content,
+      },
+    },
+  ];
+  return blocks;
+};
+
+const sendSpotLightMessage = async (
+  message: TMessage & {
+    channel: TChannelWithIntegration;
+    template: TMessageTemplate;
+  },
+  slackApi: SlackApi
+) => {
+  // Fetch Users
+  if (!message.channel.channelId) {
+    throw new Error("Channel not assigned");
+  }
+  const users = await slackApi.getUsersInChannel(message.channel.channelId);
+
+  if (!users.ok) {
+    throw new Error("Error fetching users" + users.error);
+  }
+
+  let members = users.members;
+  if (members.length === 0) {
+    throw new Error("No users in the channel");
+  }
+
+  // remove Pyezza from members :)
+  members = members.filter(
+    (value) => value !== message.channel.integration.botUserId
+  );
+
+  // Pick random User
+  const randomUser = members[Math.round(Math.random() * 10) % members.length];
+
+  // Build a message
+  const messageToSend = buildSpotlightSlackMessage(
+    message.template.content,
+    randomUser
+  );
+  console.log(messageToSend);
+  // Send a message
+
+  const messageSlack = await slackApi.sendMessage(
+    messageToSend,
+    message.channel.channelId
+  );
+
+  if (!messageSlack.ok) {
+    const errorMessage =
+      "Error message seding failed: " +
+      messageSlack.error +
+      " id: " +
+      message.channel!.channelId;
+    throw new Error(errorMessage);
+  }
+};
+
+const sendGenericSocialMessage = async (
+  message: TMessage & {
+    channel: TChannelWithIntegration;
+    template: TMessageTemplate;
+  },
+  slackApi: SlackApi
+) => {
+  if (!message.channel.channelId) {
+    throw new Error("Channel not assigned");
+  }
+
+  let messageToSend;
+
+  if (message.template.type === "socialsips") {
+    messageToSend = [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "🥤 *Time for a social sip* 🥤",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: message.template.content,
+        },
+      },
+    ];
+  } else {
+    messageToSend = [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "*Would you rather* 🤔",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: message.template.content,
+        },
+      },
+    ];
+  }
+
+  const messageSlack = await slackApi.sendMessage(
+    messageToSend,
+    message.channel.channelId
+  );
+
+  if (!messageSlack.ok) {
+    const errorMessage =
+      "Error message seding failed: " +
+      messageSlack.error +
+      " id: " +
+      message.channel!.channelId;
+    throw new Error(errorMessage);
+  }
+};
+
 export const sendSlackMessage = task({
   id: "send-message-slack",
   run: async (payload: { id: number; messageId: number }) => {
-    const channel = await prisma.channel.findUnique({
-      where: {
-        id: payload.id,
-      },
-      include: {
-        integration: true,
-      },
-    });
-
     const message = await prisma.message.findUnique({
       where: {
         id: payload.messageId,
       },
       include: {
         template: true,
-        channel: true,
+        channel: {
+          include: {
+            integration: true,
+          },
+        },
       },
     });
+
+    const channel = message?.channel;
 
     if (!message || !channel) {
       logger.error(`Message or channel not found `);
@@ -99,13 +247,11 @@ export const sendSlackMessage = task({
     }
 
     const slackApi = new SlackApi(channel.integration.token);
-    const messageSlack = await slackApi.sendMessage(
-      message.template.content,
-      message.channel.channelId
-    );
 
-    if (!messageSlack.ok) {
-      throw new Error("Error message seding failed: " + messageSlack.error);
+    if (message.template.type === "spotlight") {
+      await sendSpotLightMessage(message, slackApi);
+    } else {
+      await sendGenericSocialMessage(message, slackApi);
     }
 
     try {
@@ -154,6 +300,7 @@ export const sendMessageTask = task({
         const template = await tx.messageTemplate.findFirst({
           where: {
             id: { notIn: alreadySent.map((m) => m.id) },
+            type: channel.type as TMessageTemplate["type"],
             active: true, // Add an active field to MessageTemplate if not exists
           },
         });

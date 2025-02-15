@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
 import { Feature } from "../onboarding";
-import { CheckCircle2, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 
 export default function Features({
   features,
@@ -20,6 +20,7 @@ export default function Features({
   onSelect: (feature: string) => void;
   configuredChannels: { feature: string; channel: string; name: string } | null;
 }) {
+  console.log(configuredChannels);
   return (
     <div className="grid gap-4">
       {features.map((feature, i) => {
@@ -55,7 +56,8 @@ export default function Features({
                     )}
                     {isConfigured && (
                       <div className="text-primary">
-                        #{configuredChannels?.name}
+                        #
+                        {configuredChannels?.name || configuredChannels.channel}
                       </div>
                     )}
                   </div>

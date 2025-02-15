@@ -9,3 +9,7 @@ export type TChannelWithSettingAndMessage = PrismaModels["Channel"] & {
   setting: PrismaModels["ChannelSetting"] | null;
   Message: PrismaModels["Message"][];
 };
+
+export type TChannelWithIntegration = PrismaModels["Channel"] & {
+  integration: PrismaModels["Integration"];
+};

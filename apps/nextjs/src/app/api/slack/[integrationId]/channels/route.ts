@@ -75,8 +75,8 @@ async function createChannel(
         };
       }
     | {
-        error: string;
         ok: false;
+        error: string;
       };
 
   try {

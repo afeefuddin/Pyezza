@@ -29,7 +29,11 @@ function ChannelCard({
           <div className="capitalize text-lg">{type}</div>
           <div className="text-gray-700">Next Message at</div>
         </div>
-        <Image src="/spotlight.svg" alt="" height={100} width={100} />
+        {type === "spotlight" ? (
+          <Image src="/spotlight.svg" alt="" height={100} width={100} />
+        ) : (
+          <Image src="/wouldyourather.png" alt="" height={130} width={130} />
+        )}
       </div>
     </Card>
   );
@@ -44,9 +48,9 @@ export default function Home({ data }: { data: TIntegrationWithChannels }) {
           <Button>Add channel</Button>
         </Link>
       </div>
-      <div className="lg:grid lg:grid-cols-2">
+      <div>
         {data.channels.length > 0 ? (
-          <div>
+          <div className="lg:grid lg:grid-cols-2 gap-2">
             {data.channels.map((c) => (
               <ChannelCard
                 channelName={c.channelName ?? ""}

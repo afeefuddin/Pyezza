@@ -25,24 +25,22 @@ const slackJoinChannelResponseSchema = z.discriminatedUnion("ok", [
 ]);
 
 export class SlackApi {
-  token: string;
-  url = "https://slack.com/api";
-  formData;
+  private token: string;
+  private url = "https://slack.com/api";
+  private headers: { Authorization: string };
 
   constructor(token: string) {
     this.token = token;
-    this.formData = new FormData();
-    this.formData.set("token", this.token);
+    this.headers = {
+      Authorization: `Bearer ${this.token}`,
+    };
   }
 
   // TODO: Cache response for 10 minutes to avoid rate limiting
   async getChannels() {
     const response = await axios.get(`${this.url}/conversations.list`, {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
+      headers: this.headers,
     });
-
     const rawData = response.data;
     const parsedData = slackChannelsResponseSchema.parse(rawData);
     return parsedData.channels;
@@ -51,7 +49,10 @@ export class SlackApi {
   async joinChannel(channelId: string) {
     const response = await axios.post(
       `${this.url}/conversations.join?channel=${channelId}`,
-      this.formData
+      null,
+      {
+        headers: this.headers,
+      }
     );
     const rawData = response.data;
     const parsedData = slackJoinChannelResponseSchema.parse(rawData);
@@ -61,10 +62,12 @@ export class SlackApi {
   async createChannel(name: string) {
     const response = await axios.post(
       `${this.url}/conversations.create?name=${name}`,
-      this.formData
+      null,
+      {
+        headers: this.headers,
+      }
     );
     const rawData = response.data;
-    console.log(rawData);
     const parsedData = z
       .discriminatedUnion("ok", [
         z.object({
@@ -82,15 +85,15 @@ export class SlackApi {
     return parsedData;
   }
 
-  async sendMessage(value: string, channelId: string) {
-    this.formData.set("text", value);
-    this.formData.set("channel", channelId);
+  async sendMessage(blocks: unknown[], channelId: string) {
     const response = await axios.post(
-      `${this.url}/chat.postMessage`,
-      this.formData
+      `${this.url}/chat.postMessage?channel=${channelId}&blocks=${encodeURIComponent(JSON.stringify(blocks))}`,
+      null,
+      {
+        headers: this.headers,
+      }
     );
     const rawData = response.data;
-
     const parsedData = z
       .discriminatedUnion("ok", [
         z.object({
@@ -102,7 +105,31 @@ export class SlackApi {
         }),
       ])
       .parse(rawData);
+    return parsedData;
+  }
 
+  async getUsersInChannel(channelId: string) {
+    const response = await axios.post(
+      `${this.url}/conversations.members?channel=${channelId}`,
+      null,
+      {
+        headers: this.headers,
+      }
+    );
+    const rawData = response.data;
+    // TODO: Handle pagination for teams with > 100 users
+    const parsedData = z
+      .discriminatedUnion("ok", [
+        z.object({
+          ok: z.literal(true),
+          members: z.array(z.string()),
+        }),
+        z.object({
+          ok: z.literal(false),
+          error: z.string(),
+        }),
+      ])
+      .parse(rawData);
     return parsedData;
   }
 }

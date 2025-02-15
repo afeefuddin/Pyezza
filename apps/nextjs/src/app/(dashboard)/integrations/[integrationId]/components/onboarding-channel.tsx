@@ -25,30 +25,30 @@ const featureDetails = {
   intros: {
     title: "Team Introductions Channel",
     description:
-      "Choose where new team members will be introduced and welcomed.",
+      "A space for new team members to introduce themselves and share a bit about their background.",
     recommendation:
-      "We recommend using a dedicated channel for introductions to keep them organized and easily accessible.",
+      "We recommend using this channel to create a welcoming environment for newcomers.",
   },
   wouldyourather: {
-    title: "Discussion Topics Channel",
+    title: "Would You Rather Channel",
     description:
-      "Select where discussion prompts and conversation starters will be posted.",
+      "A fun channel where team members can engage in 'Would You Rather' questions to spark conversation.",
     recommendation:
-      "A general or team-social channel works well for engaging discussions.",
+      "This channel is great for light-hearted discussions and getting to know each other better.",
   },
-  celebration: {
-    title: "Team Celebrations Channel",
+  socialsips: {
+    title: "Social Sips Channel",
     description:
-      "Pick a channel for birthday wishes, work anniversaries, and other celebrations.",
+      "A channel dedicated to sharing social activities and casual meetups over drinks or coffee.",
     recommendation:
-      "Consider using a dedicated celebrations channel to keep the party going!",
+      "Use this channel to organize virtual or in-person social gatherings and promote team bonding.",
   },
   spotlight: {
-    title: "Spotlight Channel",
+    title: "Spotlight Questions Channel",
     description:
-      "Pick a channel for birthday wishes, work anniversaries, and other celebrations.",
+      "A channel that puts team members in the spotlight with fun and engaging questions.",
     recommendation:
-      "Consider using a dedicated celebrations channel to keep the party going!",
+      "Use this channel to ask quirky questions that encourage sharing and laughter among team members.",
   },
 };
 

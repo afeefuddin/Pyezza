@@ -86,6 +86,9 @@ async function createChannel(
         integrationId,
         channelName,
         active: false,
+        setting: {
+          create: true,
+        },
       },
     });
 
@@ -164,6 +167,9 @@ async function joinChannel(
         integrationId,
         channelId,
         active: false,
+        setting: {
+          create: true,
+        },
       },
     });
 
@@ -178,6 +184,7 @@ async function joinChannel(
           data: {
             active: true,
             channelId: data.channel.id,
+            channelName: data.channel.name,
           },
         });
 

@@ -41,7 +41,7 @@ export default function Features({
                 <div className="text-orange-600 mt-1">{feature.icon}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 justify-between">
-                    <h3 className="font-medium">{feature.name}</h3>
+                    <h3 className="font-bold text-lg">{feature.name}</h3>
                     {feature.isPremium && (
                       <TooltipProvider>
                         <Tooltip>
@@ -64,17 +64,6 @@ export default function Features({
                   <p className="text-sm text-muted-foreground mb-4">
                     {feature.description}
                   </p>
-                  <ul className="grid sm:grid-cols-2 gap-2 mb-4">
-                    {feature.details.map((detail, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center gap-2 text-sm text-muted-foreground"
-                      >
-                        <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
                   {feature.isPremium && (
                     <Button
                       variant="outline"

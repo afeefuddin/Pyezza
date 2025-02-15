@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { TIntegrationWithChannels } from "@repo/types/integration";
-import { Settings } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -31,6 +31,8 @@ function ChannelCard({
         </div>
         {type === "spotlight" ? (
           <Image src="/spotlight.svg" alt="" height={100} width={100} />
+        ) : type === "socialsips" ? (
+          <Image src="/socialsips.png" alt="" height={130} width={130} />
         ) : (
           <Image src="/wouldyourather.png" alt="" height={130} width={130} />
         )}
@@ -45,12 +47,15 @@ export default function Home({ data }: { data: TIntegrationWithChannels }) {
       <div className="flex justify-between">
         <div className="text-xl font-bold">Your Channels</div>
         <Link href={`/integrations/${data.publicId}/new`}>
-          <Button>Add channel</Button>
+          <Button>
+            <Plus />
+            Add channel
+          </Button>
         </Link>
       </div>
       <div>
         {data.channels.length > 0 ? (
-          <div className="lg:grid lg:grid-cols-2 gap-2">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4">
             {data.channels.map((c) => (
               <ChannelCard
                 channelName={c.channelName ?? ""}

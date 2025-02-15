@@ -42,13 +42,13 @@ export default function Navbar() {
               >
                 Use Cases
               </a>
-              <a
+              {/* <a
                 href="#pricing"
                 className="text-gray-300 hover:text-primary transition-colors duration-300"
                 id="el-mafl5k0m"
               >
                 Pricing
-              </a>
+              </a> */}
               <Link
                 href="/dashboard"
                 className="bg-primary text-white block px-3 py-2 rounded-lg hover:bg-orange-600"

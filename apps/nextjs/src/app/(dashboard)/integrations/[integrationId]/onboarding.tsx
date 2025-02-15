@@ -1,84 +1,66 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import React, { useState } from "react";
-import { UserCircle2, MessageSquare, PartyPopper, Trophy } from "lucide-react";
+import { MessageSquare, PartyPopper, LoaderCircle } from "lucide-react";
 import Features from "./components/features";
 import OnboardingChannel from "./components/onboarding-channel";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export interface Feature {
   id: string;
   name: string;
   icon: React.ReactNode;
   description: string;
-  details: string[];
   isPremium?: boolean;
 }
 
 const features: Feature[] = [
-  {
-    id: "intros",
-    name: "Team Introductions",
-    icon: <UserCircle2 className="h-5 w-5" />,
-    description: "Welcome new team members and facilitate introductions",
-    details: [
-      "Automated welcome messages for new team members",
-      "Customizable introduction templates",
-      "Ice-breaker questions to spark conversations",
-      "Weekly team member spotlights",
-    ],
-  },
+  // {
+  //   id: "intros",
+  //   name: "Team Introductions",
+  //   icon: <UserCircle2 className="h-5 w-5" />,
+  //   description: "Welcome new team members and facilitate introductions",
+  //   details: [
+  //     "Automated welcome messages for new team members",
+  //     "Customizable introduction templates",
+  //     "Ice-breaker questions to spark conversations",
+  //     "Weekly team member spotlights",
+  //   ],
+  // },
   {
     id: "wouldyourather",
     name: "Would you rather?",
     icon: <MessageSquare className="h-5 w-5" />,
-    description: "Keep conversations flowing with curated discussion topics",
-    details: [
-      "Daily/weekly discussion prompts",
-      "Industry-relevant conversation starters",
-      "Fun and engaging team questions",
-      "Cultural exchange topics",
-    ],
+    description: "Answer spicy would you rather questions",
   },
   {
-    id: "celebration",
-    name: "Team Celebrations",
+    id: "socialsips",
+    name: "Social Sips",
     icon: <PartyPopper className="h-5 w-5" />,
-    description: "Celebrate important moments and milestones",
-    details: [
-      "Birthday celebrations",
-      "Work anniversaries",
-      "Project completion celebrations",
-      "Personal achievement announcements",
-    ],
+    description: "Random topic starter",
   },
   {
     id: "spotlight",
-    name: "Put people in the spot",
+    name: "Put people on the spot",
     icon: <PartyPopper className="h-5 w-5" />,
-    description: "Celebrate important moments and milestones",
-    details: [
-      "Birthday celebrations",
-      "Work anniversaries",
-      "Project completion celebrations",
-      "Personal achievement announcements",
-    ],
+    description: "Put people in the spotlight and asks them questions",
   },
-  {
-    id: "rewards",
-    name: "Team Rewards & Recognition",
-    icon: <Trophy className="h-5 w-5" />,
-    description: "Recognize and reward outstanding team contributions",
-    details: [
-      "Peer-to-peer recognition system",
-      "Monthly MVP awards",
-      "Performance-based point system",
-      "Redeemable rewards catalog",
-    ],
-    isPremium: true,
-  },
+  // {
+  //   id: "rewards",
+  //   name: "Team Rewards & Recognition",
+  //   icon: <Trophy className="h-5 w-5" />,
+  //   description: "Recognize and reward outstanding team contributions",
+  //   details: [
+  //     "Peer-to-peer recognition system",
+  //     "Monthly MVP awards",
+  //     "Performance-based point system",
+  //     "Redeemable rewards catalog",
+  //   ],
+  //   isPremium: true,
+  // },
 ];
 
 interface ChannelConfig {
@@ -98,9 +80,10 @@ export default function Onboarding({
   children: React.ReactNode;
 }) {
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const router = useRouter();
   const [configuredChannels, setConfiguredChannels] =
     useState<ChannelConfig | null>(null);
-  const { mutate: submit } = useMutation({
+  const { mutate: submit, isPending } = useMutation({
     mutationKey: ["create-channel"],
     mutationFn: async () => {
       if (!configuredChannels) return;
@@ -134,6 +117,7 @@ export default function Onboarding({
       );
 
       const data = response.data;
+      router.push(`/integrations/${integrationId}`);
       return data;
     },
   });
@@ -186,9 +170,17 @@ export default function Onboarding({
             <Button
               size="lg"
               className="text-base font-semibold"
-              disabled={!configuredChannels}
+              disabled={!configuredChannels || isPending}
               onClick={() => submit()}
             >
+              {isPending && (
+                <LoaderCircle
+                  className="-ms-1 me-2 animate-spin"
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+              )}
               Submit
             </Button>
           </div>

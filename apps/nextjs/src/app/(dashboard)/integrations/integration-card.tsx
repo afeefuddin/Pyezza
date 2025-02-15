@@ -43,6 +43,7 @@ export default function IntegrationCard({
     teamId: string;
     type: string;
     publicId: string;
+    onboardingCompleted: boolean;
   };
 }) {
   const random = Math.floor(Math.random() * 10) % Backgrounds.length;
@@ -74,12 +75,14 @@ export default function IntegrationCard({
               <span className="inline-flex items-center rounded-md bg-primary-foreground px-2.5 py-0.5 font-medium text-primary-muted text-sm capitalize dark:bg-primary-muted dark:text-primary-foreground">
                 Free
               </span>
-              <span
-                className="z-10 inline-flex cursor-pointer items-center rounded-md bg-primary-foreground px-2.5 py-0.5 font-medium text-primary-muted text-sm capitalize dark:bg-primary-muted dark:text-primary-foreground"
-                data-state="closed"
-              >
-                Onboarding Incomplete
-              </span>
+              {!data.onboardingCompleted && (
+                <span
+                  className="z-10 inline-flex cursor-pointer items-center rounded-md bg-primary-foreground px-2.5 py-0.5 font-medium text-primary-muted text-sm capitalize dark:bg-primary-muted dark:text-primary-foreground"
+                  data-state="closed"
+                >
+                  Onboarding Incomplete
+                </span>
+              )}
             </div>
           </div>
           <div>

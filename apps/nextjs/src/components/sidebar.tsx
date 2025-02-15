@@ -4,15 +4,14 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconArrowLeft,
   IconBrandTabler,
-  IconSettings,
   IconUserBolt,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { usePathname } from "next/navigation";
 
 export default function SidebarDemo({
   children,
@@ -34,13 +33,13 @@ export default function SidebarDemo({
         <IconUserBolt className="group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
       ),
     },
-    {
-      label: "Billings",
-      href: "/billings",
-      icon: (
-        <IconSettings className=" group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
-      ),
-    },
+    // {
+    //   label: "Billings",
+    //   href: "/billings",
+    //   icon: (
+    //     <IconSettings className=" group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
+    //   ),
+    // },
     {
       label: "Logout",
       href: "#",
@@ -51,7 +50,7 @@ export default function SidebarDemo({
   ];
   const { user } = useUser();
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(0);
+  const pathname = usePathname();
   return (
     <div
       className={cn(
@@ -73,11 +72,12 @@ export default function SidebarDemo({
                   className={cn(
                     "p-2 text-neutral-700 hover:text-primary group ",
                     {
-                      "bg-primary/10 rounded text-primary ": selected === idx,
+                      "bg-primary/10 rounded text-primary ":
+                        pathname.startsWith(link.href),
                     }
                   )}
                   textClassName={cn("group-hover:text-primary ", {
-                    "text-primary": selected === idx,
+                    "text-primary": pathname.startsWith(link.href),
                   })}
                 />
               ))}
@@ -86,7 +86,7 @@ export default function SidebarDemo({
           <div>
             <SidebarLink
               link={{
-                label: "Manu Arora",
+                label: user?.fullName,
                 href: "#",
                 icon: (
                   <Avatar>

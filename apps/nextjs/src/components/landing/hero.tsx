@@ -97,7 +97,7 @@ export default function Hero() {
                     </span>
                   </div>
                   <div className="text-white" id="el-03m7gqi0">
-                    Welcome aboard, Sarah! 👋
+                   The Spotlight is on pyezza 
                   </div>
                 </div>
                 <div
@@ -113,7 +113,7 @@ export default function Hero() {
                     </span>
                   </div>
                   <div className="text-white" id="el-okfda609">
-                    Time for today's fun question! ✨
+                    Time for a socialsip ✨
                   </div>
                 </div>
                 <div
@@ -129,7 +129,7 @@ export default function Hero() {
                     </span>
                   </div>
                   <div className="text-white" id="el-knmxrx7m">
-                    Celebrating Tom's work anniversary! 🎉
+                    Would your rather use pyezza or be sad
                   </div>
                 </div>
               </div>

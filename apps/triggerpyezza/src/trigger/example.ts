@@ -20,6 +20,7 @@ function filterChannels(
       console.log("Disappointing");
       return;
     }
+    console.log(channel.channelName);
     const timezone = channel.setting.timezone;
     const date = new Date(
       new Date().toLocaleString("en-US", { timeZone: timezone })
@@ -64,7 +65,8 @@ function filterChannels(
         date,
         currentTime,
         startTime,
-        endTime
+        endTime,
+        channel.channelName
       );
       return;
     }
@@ -353,8 +355,8 @@ export const firstScheduledTask = schedules.task({
           },
         },
       });
-      console.log(channels);
       const channelsToProcess = filterChannels(channels);
+      console.log(channelsToProcess);
       await Promise.all(
         channelsToProcess.map((channel) =>
           sendMessageTask

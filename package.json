@@ -15,7 +15,7 @@
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "migrate": "cd packages/database && npx prisma format && npx prisma migrate dev",
-    "build": "tsc"
+    "build": "yarn build:packages && cd apps/nextjs && yarn build"
   },
   "devDependencies": {
     "eslint": "^8.48.0",

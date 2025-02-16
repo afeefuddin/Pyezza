@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
+  "files": [
+    "src"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "yarn db:generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
     "db:migrate": "prisma db migrate dev"

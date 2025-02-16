@@ -2,6 +2,7 @@ import { getUser } from "@/actions/user";
 import { SlackOauth } from "@/lib/slack-oauth";
 import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
+import { prisma } from "@repo/database";
 
 export async function GET(request: NextRequest) {
   const user = await getUser();
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     redirect("/dashboard?error=slack");
   }
 
-  await prisma?.integration.upsert({
+  await prisma.integration.upsert({
     where: {
       user: {
         id: user.id,

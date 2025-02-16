@@ -54,7 +54,7 @@ export default function Settings({
     onSuccess() {
       router.push(`/integrations/${integrationId}`);
       revalidatePath(
-        `/integrations/${integrationId}/c/${data.channel.publicId}`
+        `/integrations/${integrationId}/c/${data.channel.publicId}`, "page"
       );
     },
   });

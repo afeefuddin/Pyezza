@@ -119,7 +119,7 @@ export default function Onboarding({
       );
 
       const data = response.data;
-      revalidatePath(`/integrations/${integrationId}`);
+      revalidatePath(`/integrations/${integrationId}`, "page");
       router.replace(`/integrations/${integrationId}`);
       return data;
     },

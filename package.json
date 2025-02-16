@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "yarn workspace @repo/nextjs dev",
+    "start": "yarn workspace @repo/nextjs start",
     "build:packages": "yarn workspace @repo/database build",
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",

@@ -42,7 +42,7 @@ export default function SidebarDemo({
     // },
     {
       label: "Logout",
-      href: "#",
+      href: "/logout",
       icon: (
         <IconArrowLeft className=" group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
       ),

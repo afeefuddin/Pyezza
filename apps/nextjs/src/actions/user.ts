@@ -1,6 +1,6 @@
 "use server";
 import { currentUser } from "@clerk/nextjs/server";
-import { prisma } from "@repo/database";
+import { prisma, testPrisma } from "@repo/database";
 
 export async function getUser() {
   let clerkUser;
@@ -12,6 +12,8 @@ export async function getUser() {
   if (!clerkUser) {
     return null;
   }
+
+  testPrisma();
   try {
     const data = prisma.user.upsert({
       where: {

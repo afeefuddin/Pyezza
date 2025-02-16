@@ -7,16 +7,23 @@ export class SlackOauth {
   private static AccessURL = "https://slack.com/api/oauth.v2.access";
   client_id: string;
   private client_secret: string;
-  private static slackResponseSchema = z.object({
-    access_token: z.string(),
-    scope: z.string(),
-    bot_user_id: z.string(),
-    app_id: z.string(),
-    team: z.object({
-      name: z.string(),
-      id: z.string(),
+  private static slackResponseSchema = z.discriminatedUnion("ok", [
+    z.object({
+      ok: z.literal(true),
+      access_token: z.string(),
+      scope: z.string(),
+      bot_user_id: z.string(),
+      app_id: z.string(),
+      team: z.object({
+        name: z.string(),
+        id: z.string(),
+      }),
     }),
-  });
+    z.object({
+      ok: z.literal(false),
+      error: z.any(),
+    }),
+  ]);
 
   constructor() {
     this.client_id = String(process.env.SLACK_CLIENT_ID);
@@ -50,9 +57,12 @@ export class SlackOauth {
       });
       const data = response.data;
       const parsedData = SlackOauth.slackResponseSchema.parse(data);
+      if (parsedData.ok === false) {
+        throw new Error(parsedData.error);
+      }
       return parsedData;
-    } catch {
-      console.log("error here");
+    } catch (error) {
+      console.log("error here", error);
       return null;
     }
   }

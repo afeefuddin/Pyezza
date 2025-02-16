@@ -13,10 +13,12 @@
     "dev": "yarn workspace @repo/nextjs dev",
     "start": "yarn workspace @repo/nextjs start",
     "build:packages": "yarn workspace @repo/database build",
+    "db:deploy": "yarn workspace @repo/database db:deploy",
+    "db:generate": "yarn workspace @repo/database db:generate",
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "migrate": "cd packages/database && npx prisma format && npx prisma migrate dev",
-    "build": "yarn build:packages && cd apps/nextjs && yarn build"
+    "build": "yarn db:generate && yarn db:deploy && cd apps/nextjs && yarn build"
   },
   "devDependencies": {
     "eslint": "^8.48.0",

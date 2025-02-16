@@ -52,25 +52,29 @@ export default function Settings({
       );
     },
     onSuccess() {
-      router.refresh();
       router.push(`/integrations/${integrationId}`);
+      revalidatePath(
+        `/integrations/${integrationId}/c/${data.channel.publicId}`
+      );
     },
   });
 
   return (
     <div className="flex flex-col gap-12 px-4">
-      <div className="grid grid-cols-8 items-center">
-        <Image
-          src="/slack.svg"
-          alt=""
-          width={30}
-          height={30}
-          className="col-span-1"
-        />
-        <div className="col-span-3">
-          <div>Channel</div>
-          <div className="text-gray-800 text-sm">
-            The channel pyezza will send messages to
+      <div className="flex flex-col items-start gap-4 lg:grid grid-cols-8 lg:gap-0 lg:items-center">
+        <div className="col-span-4 grid grid-cols-4 ">
+          <Image
+            src="/slack.svg"
+            alt=""
+            width={30}
+            height={30}
+            className="col-span-1"
+          />
+          <div className="col-span-3">
+            <div>Channel</div>
+            <div className="text-gray-800 text-sm">
+              The channel pyezza will send messages to
+            </div>
           </div>
         </div>
         <Input
@@ -81,44 +85,38 @@ export default function Settings({
       </div>
       {data.channel.type !== "celebration" && (
         <>
-          <div className="grid grid-cols-8 items-center">
-            <Calendar size={30} className="text-muted-foreground" />
-            <div className="col-span-3">
-              <div>Days of the week</div>
-              <div className="text-gray-800 text-sm">
-                On What days should pyezza send message
+          <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+            <div className=" grid grid-cols-4 col-span-4">
+              <Calendar size={30} className="text-muted-foreground" />
+              <div className="col-span-3">
+                <div>Days of the week</div>
+                <div className="text-gray-800 text-sm">
+                  On What days should pyezza send message
+                </div>
               </div>
             </div>
             <DaysOfTheWeek setValue={setDaysOfTheWeek} value={daysOfTheWeek} />
           </div>
 
-          <div className="grid grid-cols-8 items-center">
-            <Clock size={30} className="text-muted-foreground" />
-            <div className="col-span-3">
-              <div>Time of the day</div>
-              <div className="text-gray-800 text-sm">
-                At what time should pyezza drop a banger
+          <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+            <div className=" grid grid-cols-4 col-span-4">
+              <Clock size={30} className="text-muted-foreground" />
+              <div className="col-span-3">
+                <div>Time of the day</div>
+                <div className="text-gray-800 text-sm">
+                  At what time should pyezza drop a banger
+                </div>
               </div>
             </div>
             <TimeOfDay date={timeOfTheDay} setDate={setTimeOfTheDay} />
           </div>
-
-          {/* <div className="grid grid-cols-8 items-center">
-            <RotateCw size={30} className="text-muted-foreground" />
-            <div className="col-span-3">
-              <div>Every N week</div>
-              <div className="text-gray-800 text-sm">
-                Do you wanna have fun every week?
+          <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+            <div className=" grid grid-cols-4 col-span-4">
+              <Earth size={30} className="text-muted-foreground" />
+              <div className="col-span-3 text-start">
+                <div>Select Your timezone</div>
+                <div className="text-gray-800 text-sm"></div>
               </div>
-            </div>
-            <EveryNWeekSelect setValue={setEveryNWeek} value={everyNWeek} />
-          </div> */}
-
-          <div className="grid grid-cols-8 items-center">
-            <Earth size={30} className="text-muted-foreground" />
-            <div className="col-span-3">
-              <div>Select Your timezone</div>
-              <div className="text-gray-800 text-sm"></div>
             </div>
             <TimezoneComboBox value={timezone} onChange={setTimezone} />
           </div>

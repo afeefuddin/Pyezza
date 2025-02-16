@@ -54,7 +54,7 @@ export default function SidebarDemo({
   return (
     <div
       className={cn(
-        "rounded-md flex flex-col md:flex-row bg-primary-foreground w-full flex-1 mx-auto border   overflow-hidden",
+        "rounded-md flex flex-col md:flex-row bg-primary-foreground w-full flex-1 mx-auto border overflow-hidden",
         "h-screen"
       )}
     >

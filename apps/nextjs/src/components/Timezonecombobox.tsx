@@ -51,7 +51,7 @@ export function TimezoneComboBox({ value, onChange }: TimezoneComboBoxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-96 justify-between"
+          className=" w-full lg:w-96 justify-between"
         >
           {currentTimezone
             ? `${currentTimezone.label} (${currentTimezone.zones.join(", ")})`

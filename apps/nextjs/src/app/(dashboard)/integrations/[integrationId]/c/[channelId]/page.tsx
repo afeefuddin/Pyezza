@@ -16,7 +16,7 @@ export default async function Channel({
   }
 
   return (
-    <div className="p-4 sm:p-8 md:p-16 w-full overflow-y-auto">
+    <div className="p-4 sm:p-8 lg:p-16 w-full overflow-y-auto">
       <div className="p-4 pt-0">
         <div className="flex items-center gap-2">
           <Link href={`/integrations/${integrationId}`}>

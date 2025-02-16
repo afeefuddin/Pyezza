@@ -12,7 +12,7 @@ import { TimeOfDay } from "./components/timeofday";
 import { DaysOfTheWeek } from "./components/daysoftheweek";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { secondToDate } from "@repo/lib/date";
+import { dateToSeconds, secondToDate } from "@repo/lib/date";
 import { useRouter } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -29,6 +29,7 @@ export default function Settings({
   } & Partial<TChannelSetting>;
   integrationId: string;
 }) {
+  console.log(data);
   const [daysOfTheWeek, setDaysOfTheWeek] = useState(data.daysOfWeek ?? []);
   const [timeOfTheDay, setTimeOfTheDay] = useState<Date | undefined>(
     data.timeOfday ? secondToDate(data.timeOfday) : undefined
@@ -43,7 +44,7 @@ export default function Settings({
     mutationFn: async () => {
       const body = {
         daysOfTheWeek,
-        timeOfTheDay,
+        timeOfTheDay: dateToSeconds(timeOfTheDay),
         timezone,
       };
       await axios.put(
@@ -54,7 +55,8 @@ export default function Settings({
     onSuccess() {
       router.push(`/integrations/${integrationId}`);
       revalidatePath(
-        `/integrations/${integrationId}/c/${data.channel.publicId}`, "page"
+        `/integrations/${integrationId}/c/${data.channel.publicId}`,
+        "page"
       );
     },
   });

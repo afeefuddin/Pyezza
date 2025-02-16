@@ -17,6 +17,4 @@ export type PrismaModels = {
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;
 
-export const testPrisma = () => {
-  console.log("Here I am able to call this", process.env.DATABASE_URL, prisma);
-};
+export const testPrisma = () => {};

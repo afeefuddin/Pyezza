@@ -5,11 +5,10 @@ import { z } from "zod";
 import type { TChannelSetting } from "@repo/types/channelSetting";
 
 import { prisma } from "@repo/database";
-import { dateToSeconds } from "@repo/lib/date";
 
 const updateSettingApiSchema = z.object({
   daysOfTheWeek: z.array(z.number()).optional(),
-  timeOfTheDay: z.string().optional(),
+  timeOfTheDay: z.number().optional(),
   timezone: z.string(),
 });
 
@@ -60,7 +59,7 @@ export const PUT = withError(
     }
 
     if (data.timeOfTheDay) {
-      updateData["timeOfday"] = dateToSeconds(new Date(data.timeOfTheDay));
+      updateData["timeOfday"] = data.timeOfTheDay;
     }
 
     await prisma.channelSetting.update({

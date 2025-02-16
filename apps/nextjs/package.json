@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "yarn with-env next dev",
+    "build": "yarn with-env next build",
+    "start": "yarn with-env next start",
+    "lint": "yarn with-env next lint",
+    "with-env": "yarn run dotenv -e ../../.env"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.14",
@@ -44,6 +45,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "latest",
     "eslint": "^9",
     "eslint-config-next": "15.1.5",
     "postcss": "^8",

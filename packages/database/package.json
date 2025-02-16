@@ -8,14 +8,17 @@
   ],
   "scripts": {
     "build": "yarn db:generate",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate",
-    "db:migrate": "prisma db migrate dev"
+    "db:generate": "yarn with-env prisma generate",
+    "db:push": "yarn with-env prisma db push --skip-generate",
+    "db:deploy": "yarn with-env prisma migrate deploy",
+    "db:migrate": "yarn with-env prisma db migrate dev",
+    "with-env": "yarn run dotenv -e ../../.env"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0"
   },
   "devDependencies": {
+    "dotenv-cli": "latest",
     "prisma": "^5.0.0",
     "typescript": "^5.2.2"
   }

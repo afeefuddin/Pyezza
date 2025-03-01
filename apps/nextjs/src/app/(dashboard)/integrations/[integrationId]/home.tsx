@@ -10,11 +10,13 @@ function ChannelCard({
   type,
   publicId,
   integrationId,
+  messageSent,
 }: {
   channelName: string;
   type: string;
   publicId: string;
   integrationId: string;
+  messageSent: number;
 }) {
   return (
     <Card className="p-6 flex flex-col gap-4 rounded">
@@ -27,7 +29,7 @@ function ChannelCard({
       <div className="flex justify-between">
         <div className="flex flex-col gap-1">
           <div className="capitalize text-lg">{type}</div>
-          <div className="text-gray-700">Next Message at</div>
+          <div className="text-gray-700">Messages Sent: {messageSent}</div>
         </div>
         {type === "spotlight" ? (
           <Image src="/spotlight.svg" alt="" height={100} width={100} />
@@ -63,6 +65,7 @@ export default function Home({ data }: { data: TIntegrationWithChannels }) {
                 key={c.channelId}
                 publicId={c.publicId}
                 integrationId={data.publicId}
+                messageSent={c._count.Message}
               />
             ))}
           </div>

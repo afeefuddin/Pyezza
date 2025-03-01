@@ -13,7 +13,7 @@ export default function CTA() {
             communication. Send messages, receive notifications, and collaborate
             effectively with your team.
           </p>
-          <Link href="/api/auth/slack">
+          <Link href="/api/auth/slack" prefetch={false}>
             <Button
               className="bg-secondary hover:bg-secondary/90 py-4 text-base font-medium"
               size="lg"

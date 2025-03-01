@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import revalidatePathAction from "@/actions/revalidate";
 
 export interface Feature {
   id: string;
@@ -119,7 +119,7 @@ export default function Onboarding({
       );
 
       const data = response.data;
-      revalidatePath(`/integrations/${integrationId}`, "page");
+      revalidatePathAction(`/integrations/${integrationId}`, "page");
       router.replace(`/integrations/${integrationId}`);
       return data;
     },

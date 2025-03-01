@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <section
@@ -35,20 +37,12 @@ export default function Hero() {
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-2s"
               id="el-rvt8tr51"
             >
-              <a
-                href="#contact"
+              <Link
+                href="/dashboard"
                 className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors duration-300 text-lg font-semibold"
-                id="el-l4klgg3l"
               >
                 Get Started Free
-              </a>
-              <a
-                href="#features"
-                className="border-2 border-primary text-orange-500 px-8 py-3 rounded-lg hover:bg-orange-500 hover:text-white transition-colors duration-300 text-lg font-semibold"
-                id="el-q0igpj2f"
-              >
-                Learn More
-              </a>
+              </Link>
             </div>
             <div
               className="mt-8 text-gray-400 flex items-center gap-4 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-3s"
@@ -97,7 +91,7 @@ export default function Hero() {
                     </span>
                   </div>
                   <div className="text-white" id="el-03m7gqi0">
-                   The Spotlight is on pyezza 
+                    The Spotlight is on pyezza
                   </div>
                 </div>
                 <div

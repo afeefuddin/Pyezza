@@ -17,4 +17,5 @@ export type PrismaModels = {
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;
 
-export const testPrisma = () => {};
+export const testPrisma = () => {
+};

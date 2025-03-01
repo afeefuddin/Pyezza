@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { dateToSeconds, secondToDate } from "@repo/lib/date";
 import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import revalidatePathAction from "@/actions/revalidate";
 
 export default function Settings({
   data,
@@ -53,11 +53,11 @@ export default function Settings({
       );
     },
     onSuccess() {
-      router.push(`/integrations/${integrationId}`);
-      revalidatePath(
+      revalidatePathAction(
         `/integrations/${integrationId}/c/${data.channel.publicId}`,
         "page"
       );
+      router.push(`/integrations/${integrationId}`);
     },
   });
 

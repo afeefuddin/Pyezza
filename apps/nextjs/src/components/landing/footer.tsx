@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer id="footer" className="bg-neutral-900 pt-20 pb-10">
@@ -193,23 +195,13 @@ export default function Footer() {
                   About
                 </a>
               </li>
-              <li id="el-zi6asj5l">
-                <a
-                  href="#"
+              <li>
+                <Link
+                  href="/privacy"
                   className="text-gray-400 hover:text-orange-500 transition-colors"
-                  id="el-u16lm6uc"
-                >
-                  Careers
-                </a>
-              </li>
-              <li id="el-0pj2yb6d">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-orange-500 transition-colors"
-                  id="el-zigy0ep6"
                 >
                   Privacy
-                </a>
+                </Link>
               </li>
               <li id="el-dx28xsj9">
                 <a
@@ -238,9 +230,8 @@ export default function Footer() {
             <a
               href="#"
               className="text-gray-400 hover:text-orange-500 transition-colors"
-              id="el-rm2cqda5"
             >
-              Privacy Policy
+              <Link href="/privacy">Privacy Policy</Link>
             </a>
             <a
               href="#"

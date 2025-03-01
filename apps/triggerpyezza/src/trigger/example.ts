@@ -20,7 +20,6 @@ function filterChannels(
       console.log("Disappointing");
       return;
     }
-    console.log(channel.channelName);
     const timezone = channel.setting.timezone;
     const date = new Date(
       new Date().toLocaleString("en-US", { timeZone: timezone })

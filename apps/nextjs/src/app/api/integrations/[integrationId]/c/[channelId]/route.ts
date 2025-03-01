@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { TChannelSetting } from "@repo/types/channelSetting";
 
 import { prisma } from "@repo/database";
+import revalidatePathAction from "@/actions/revalidate";
 
 const updateSettingApiSchema = z.object({
   daysOfTheWeek: z.array(z.number()).optional(),
@@ -73,6 +74,7 @@ export const PUT = withError(
 
     return NextResponse.json({
       update: true,
+      path: `/integrations/${integrationId}/c/${channelId}`,
     });
   })
 );

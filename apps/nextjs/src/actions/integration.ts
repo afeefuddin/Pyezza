@@ -31,6 +31,13 @@ export async function getIntegration(publicId: string) {
           where: {
             active: true,
           },
+          include: {
+            _count: {
+              select: {
+                Message: true,
+              },
+            },
+          },
         },
       },
     });

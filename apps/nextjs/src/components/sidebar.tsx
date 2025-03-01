@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { usePathname } from "next/navigation";
 
@@ -65,22 +65,44 @@ export default function SidebarDemo({
               <Logo />
             </>
             <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink
-                  key={idx}
-                  link={link}
-                  className={cn(
-                    "p-2 text-neutral-700 hover:text-primary group ",
-                    {
-                      "bg-primary/10 rounded text-primary ":
-                        pathname.startsWith(link.href),
-                    }
-                  )}
-                  textClassName={cn("group-hover:text-primary ", {
-                    "text-primary": pathname.startsWith(link.href),
-                  })}
-                />
-              ))}
+              {links.map((link, idx) => {
+                if (link.href === "/logout") {
+                  return (
+                    <SignOutButton key={idx}>
+                      <SidebarLink
+                        key={idx}
+                        link={link}
+                        className={cn(
+                          "p-2 text-neutral-700 hover:text-primary group ",
+                          {
+                            "bg-primary/10 rounded text-primary ":
+                              pathname.startsWith(link.href),
+                          }
+                        )}
+                        textClassName={cn("group-hover:text-primary ", {
+                          "text-primary": pathname.startsWith(link.href),
+                        })}
+                      />
+                    </SignOutButton>
+                  );
+                }
+                return (
+                  <SidebarLink
+                    key={idx}
+                    link={link}
+                    className={cn(
+                      "p-2 text-neutral-700 hover:text-primary group ",
+                      {
+                        "bg-primary/10 rounded text-primary ":
+                          pathname.startsWith(link.href),
+                      }
+                    )}
+                    textClassName={cn("group-hover:text-primary ", {
+                      "text-primary": pathname.startsWith(link.href),
+                    })}
+                  />
+                );
+              })}
             </div>
           </div>
           <div>

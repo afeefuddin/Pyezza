@@ -28,27 +28,6 @@ export default function Navbar() {
               >
                 Features
               </a>
-              <a
-                href="#integrations"
-                className="text-gray-300 hover:text-primary transition-colors duration-300"
-                id="el-izmvovik"
-              >
-                Integrations
-              </a>
-              <a
-                href="#usecases"
-                className="text-gray-300 hover:text-primary transition-colors duration-300"
-                id="el-1exnbeoj"
-              >
-                Use Cases
-              </a>
-              {/* <a
-                href="#pricing"
-                className="text-gray-300 hover:text-primary transition-colors duration-300"
-                id="el-mafl5k0m"
-              >
-                Pricing
-              </a> */}
               <Link
                 href="/dashboard"
                 className="bg-primary text-white block px-3 py-2 rounded-lg hover:bg-orange-600"
@@ -71,9 +50,9 @@ export default function Navbar() {
                 id="el-uf37vshz"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M4 6h16M4 12h16M4 18h16"
                   id="el-2fu4d975"
                 ></path>

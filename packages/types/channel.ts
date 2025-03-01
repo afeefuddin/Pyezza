@@ -1,15 +1,21 @@
 import type { PrismaModels } from "@repo/database";
 
 export type TChannel = PrismaModels["Channel"];
-export type TChannelWithSetting = PrismaModels["Channel"] & {
+export type TChannelWithSetting = TChannel & {
   setting: PrismaModels["ChannelSetting"] | null;
 };
 
-export type TChannelWithSettingAndMessage = PrismaModels["Channel"] & {
+export type TChannelWithMessageCount = TChannel & {
+  _count: {
+    Message: number;
+  };
+};
+
+export type TChannelWithSettingAndMessage = TChannel & {
   setting: PrismaModels["ChannelSetting"] | null;
   Message: PrismaModels["Message"][];
 };
 
-export type TChannelWithIntegration = PrismaModels["Channel"] & {
+export type TChannelWithIntegration = TChannel & {
   integration: PrismaModels["Integration"];
 };

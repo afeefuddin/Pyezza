@@ -2250,6 +2250,7 @@ __metadata:
     "@radix-ui/react-slot": "npm:^1.1.1"
     "@radix-ui/react-tooltip": "npm:^1.1.7"
     "@repo/database": "npm:*"
+    "@repo/types": "npm:*"
     "@tabler/icons-react": "npm:^3.29.0"
     "@tanstack/react-query": "npm:^5.64.2"
     "@types/node": "npm:^20"
@@ -2277,7 +2278,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@repo/types@workspace:packages/types":
+"@repo/types@npm:*, @repo/types@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@repo/types@workspace:packages/types"
   languageName: unknown
@@ -5871,6 +5872,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "messageTemplate@workspace:scripts/messageTemplate"
   dependencies:
+    dotenv-cli: "npm:latest"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.7.3"
   languageName: unknown

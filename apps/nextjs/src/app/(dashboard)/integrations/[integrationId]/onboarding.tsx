@@ -16,6 +16,7 @@ export interface Feature {
   name: string;
   icon: React.ReactNode;
   description: string;
+  example: string;
   isPremium?: boolean;
 }
 
@@ -35,20 +36,23 @@ const features: Feature[] = [
   {
     id: "wouldyourather",
     name: "Would you rather?",
-    icon: <MessageSquare className="h-5 w-5" />,
+    icon: "🎭",
     description: "Answer spicy would you rather questions",
+    example: "Would you rather have unlimited pie or unlimited pizza?",
   },
   {
     id: "socialsips",
     name: "Social Sips",
-    icon: <PartyPopper className="h-5 w-5" />,
+    icon: "🍹",
     description: "Random topic starter",
+    example: "What was your first concert experience?",
   },
   {
     id: "spotlight",
     name: "Put people on the spot",
-    icon: <PartyPopper className="h-5 w-5" />,
+    icon: "🔍",
     description: "Put people in the spotlight and asks them questions",
+    example: "What's one skill you'd like to master this year?",
   },
   // {
   //   id: "rewards",

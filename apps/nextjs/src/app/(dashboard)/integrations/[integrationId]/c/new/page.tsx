@@ -1,5 +1,5 @@
 import { getIntegration } from "@/actions/integration";
-import Onboarding from "../onboarding";
+import Onboarding from "../../onboarding";
 
 export default async function Page({
   params,
@@ -18,7 +18,7 @@ export default async function Page({
           Add a new channel
         </div>
         <div className="text-base md:text-xl font-semibold text-secondary ">
-          Let's start configuring the pyezza now.
+          Let's start configuring pyezza now.
         </div>
       </Onboarding>
     </div>

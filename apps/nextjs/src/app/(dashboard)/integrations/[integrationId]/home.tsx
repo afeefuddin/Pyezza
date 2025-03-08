@@ -47,11 +47,12 @@ function ChannelCard({
 }
 
 export default function Home({ data }: { data: TIntegrationWithChannels }) {
+  console.log(data)
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between">
         <div className="text-xl font-bold">Your Channels</div>
-        <Link href={`/integrations/${data.publicId}/new`}>
+        <Link href={`/integrations/${data.publicId}/c/new`}>
           <Button>
             <Plus />
             Add channel
@@ -65,7 +66,7 @@ export default function Home({ data }: { data: TIntegrationWithChannels }) {
               <ChannelCard
                 channelName={c.channelName ?? ""}
                 type={c.type}
-                key={c.channelId}
+                key={c.publicId}
                 publicId={c.publicId}
                 integrationId={data.publicId}
                 messageSent={c._count.Message}

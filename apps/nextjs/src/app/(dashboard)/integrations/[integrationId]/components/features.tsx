@@ -20,9 +20,8 @@ export default function Features({
   onSelect: (feature: string) => void;
   configuredChannels: { feature: string; channel: string; name: string } | null;
 }) {
-  console.log(configuredChannels);
   return (
-    <div className="grid gap-4">
+    <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       {features.map((feature, i) => {
         const isConfigured = configuredChannels?.feature === feature.id;
 
@@ -34,15 +33,24 @@ export default function Features({
             transition={{ delay: i * 0.1 }}
           >
             <Card
-              className={`p-6 ${feature.isPremium ? "opacity-70" : "cursor-pointer hover:border-orange-400"} ${isConfigured && "border-2 border-primary"} transition-colors`}
+              className={`p-8 h-full ${feature.isPremium ? "opacity-70" : "cursor-pointer  hover:border-primary"} ${isConfigured && "border-2 border-primary"} transition-colors`}
               onClick={() => !feature.isPremium && onSelect(feature.id)}
             >
-              <div className="flex items-start gap-4">
-                <div className="text-orange-600 mt-1">{feature.icon}</div>
+              <div className="flex-col items-start gap-4">
+                <div className="flex-row flex justify-between items-center">
+                  <div className="text-orange-600 mt-1 text-3xl">
+                    {feature.icon}
+                  </div>
+                  {isConfigured && (
+                    <div className="text-white bg-primary/85 py-px px-1 rounded-lg ">
+                      #{configuredChannels?.name || configuredChannels.channel}
+                    </div>
+                  )}
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 justify-between">
                     <h3 className="font-bold text-lg">{feature.name}</h3>
-                    {feature.isPremium && (
+                    {/* {feature.isPremium && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -53,16 +61,13 @@ export default function Features({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    )}
-                    {isConfigured && (
-                      <div className="text-primary">
-                        #
-                        {configuredChannels?.name || configuredChannels.channel}
-                      </div>
-                    )}
+                    )} */}
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     {feature.description}
+                  </p>
+                  <p className="text-sm text-muted-foreground italic">
+                    Example: "{feature.example}"
                   </p>
                   {feature.isPremium && (
                     <Button

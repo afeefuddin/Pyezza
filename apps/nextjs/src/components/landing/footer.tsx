@@ -23,12 +23,9 @@ export default function Footer() {
             © 2025 Pyezza. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0" id="el-9o1gbnpu">
-            <a
-              href="#"
-              className="text-gray-400 hover:text-orange-500 transition-colors"
-            >
+            <span className="text-gray-400 hover:text-orange-500 transition-colors">
               <Link href="/privacy">Privacy Policy</Link>
-            </a>
+            </span>
           </div>
         </div>
       </div>

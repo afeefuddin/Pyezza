@@ -70,6 +70,7 @@ export default function SidebarDemo({
                   return (
                     <SignOutButton key={idx}>
                       <SidebarLink
+                        noLink={true}
                         key={idx}
                         link={link}
                         className={cn(

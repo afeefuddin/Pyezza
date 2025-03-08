@@ -334,10 +334,8 @@ export const sendMessageTask = task({
 
 export const firstScheduledTask = schedules.task({
   id: "first-scheduled-task",
-  // Every hour
-  cron: "0 * * * *",
-  // Set an optional maxDuration to prevent tasks from running indefinitely
-  maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute
+  cron: "*/15 * * * *",
+  maxDuration: 300,
   run: async (payload, { ctx }) => {
     try {
       const channels = await prisma.channel.findMany({

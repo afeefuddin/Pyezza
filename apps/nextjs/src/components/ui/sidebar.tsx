@@ -89,7 +89,7 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-muted border-r w-[300px] flex-shrink-0",
+          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-muted border-r w-[250px] flex-shrink-0",
           className
         )}
         animate={{
@@ -159,14 +159,44 @@ export const SidebarLink = ({
   link,
   className,
   textClassName,
+  noLink,
   ...props
 }: {
   link: Links;
   className?: string;
   textClassName?: string;
   props?: LinkProps;
+  noLink?: boolean;
 }) => {
-  const { open, animate } = useSidebar();
+  const { open, animate, setOpen } = useSidebar();
+  if (noLink) {
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-start gap-2 group/sidebar py-2",
+          className
+        )}
+      >
+        {link.icon}
+        <motion.span
+          animate={{
+            display: animate
+              ? open
+                ? "inline-block"
+                : "none"
+              : "inline-block",
+            opacity: animate ? (open ? 1 : 0) : 1,
+          }}
+          className={cn(
+            "text-muted-foreground text-base group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0",
+            textClassName
+          )}
+        >
+          {link.label}
+        </motion.span>
+      </div>
+    );
+  }
   return (
     <Link
       href={link.href}
@@ -174,7 +204,8 @@ export const SidebarLink = ({
         "flex items-center justify-start gap-2 group/sidebar py-2",
         className
       )}
-      prefetch  
+      onClick={() => setOpen(false)}
+      prefetch
       {...props}
     >
       {link.icon}

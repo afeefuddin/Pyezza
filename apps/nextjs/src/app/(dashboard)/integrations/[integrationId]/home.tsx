@@ -19,26 +19,29 @@ function ChannelCard({
   messageSent: number;
 }) {
   return (
-    <Card className="p-6 flex flex-col gap-4 rounded">
-      <div className="flex flex-row justify-between">
-        <div className="font-bold">#{channelName}</div>
-        <Link href={`/integrations/${integrationId}/c/${publicId}`} prefetch>
-          <Settings size={20} />
-        </Link>
-      </div>
-      <div className="flex justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="capitalize text-lg">{type}</div>
-          <div className="text-gray-700">Messages Sent: {messageSent}</div>
+    <Card className="group relative p-6 flex flex-col gap-4 rounded-lg transition-all hover:cursor-pointer hover:shadow-lg">
+      <Link href={`/integrations/${integrationId}/c/${publicId}`} prefetch>
+        <div className="absolute inset-0 bg-gradient-to-r rounded-lg from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="flex flex-row justify-between shrink gap-4">
+          <div className="text-2xl  truncate font-bold shrink">
+            #{channelName}
+          </div>
+          <Settings size={20}  />
         </div>
-        {type === "spotlight" ? (
-          <Image src="/spotlight.svg" alt="" height={100} width={100} />
-        ) : type === "socialsips" ? (
-          <Image src="/socialsips.png" alt="" height={130} width={130} />
-        ) : (
-          <Image src="/wouldyourather.png" alt="" height={130} width={130} />
-        )}
-      </div>
+        <div className="flex justify-between">
+          <div className="flex flex-col gap-1">
+            <div className="capitalize text-lg">{type}</div>
+            <div className="text-gray-700">Messages Sent: {messageSent}</div>
+          </div>
+          {type === "spotlight" ? (
+            <Image src="/spotlight.svg" alt="" height={100} width={100} />
+          ) : type === "socialsips" ? (
+            <Image src="/socialsips.png" alt="" height={130} width={130} />
+          ) : (
+            <Image src="/wouldyourather.png" alt="" height={130} width={130} />
+          )}
+        </div>
+      </Link>
     </Card>
   );
 }

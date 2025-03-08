@@ -19,15 +19,8 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <div className="hidden md:block" id="el-zo2mfve3">
-            <div className="ml-10 flex items-center space-x-8" id="el-cmpyln5q">
-              <a
-                href="#features"
-                className="text-gray-300 hover:text-primary transition-colors duration-300"
-                id="el-ve2hjtco"
-              >
-                Features
-              </a>
+          <div >
+            <div className="ml-10 flex items-center space-x-8">
               <Link
                 href="/dashboard"
                 className="bg-primary text-white block px-3 py-2 rounded-lg hover:bg-orange-600"
@@ -36,69 +29,6 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
-
-          <div className="md:hidden" id="el-36zedrox">
-            <button
-              id="mobile-menu-button"
-              className="text-gray-300 hover:text-white"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                id="el-uf37vshz"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                  id="el-2fu4d975"
-                ></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div id="mobile-menu" className="hidden md:hidden bg-neutral-900">
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3" id="el-vplbbulf">
-          <a
-            href="#features"
-            className="text-gray-300 hover:text-primary block px-3 py-2"
-            id="el-f94kzwaw"
-          >
-            Features
-          </a>
-          <a
-            href="#integrations"
-            className="text-gray-300 hover:text-primary block px-3 py-2"
-            id="el-2r3mzdmh"
-          >
-            Integrations
-          </a>
-          <a
-            href="#usecases"
-            className="text-gray-300 hover:text-primary block px-3 py-2"
-            id="el-bzl8at7c"
-          >
-            Use Cases
-          </a>
-          <a
-            href="#pricing"
-            className="text-gray-300 hover:text-primary block px-3 py-2"
-            id="el-0lg176oj"
-          >
-            Pricing
-          </a>
-          <Link
-            href="/dashboard"
-            className="bg-primary text-white block px-3 py-2 rounded-lg hover:bg-orange-600"
-            id="el-5zwuwhom"
-          >
-            Get Started
-          </Link>
         </div>
       </div>
     </nav>

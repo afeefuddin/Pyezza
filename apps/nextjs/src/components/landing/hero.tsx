@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="pt-20 bg-neutral-900 min-h-screen flex items-center"
+      className="pt-20 bg-neutral-900 h-full flex items-center"
     >
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
@@ -44,7 +44,7 @@ export default function Hero() {
                 Get Started Free
               </Link>
             </div>
-            <div
+            {/* <div
               className="mt-8 text-gray-400 flex items-center gap-4 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-3s"
               id="el-j4eg6rpv"
             >
@@ -63,7 +63,7 @@ export default function Hero() {
                 ></div>
               </div>
               <span id="el-r3gwrklz">1000+ teams already using Pyezza</span>
-            </div>
+            </div> */}
           </div>
           <div
             className="relative animate__animated animate__fadeInRight"

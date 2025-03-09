@@ -127,8 +127,7 @@ export default function Onboarding({
     },
     onSuccess() {
       revalidatePathAction(`/integrations/${integrationId}`, "page");
-      router.replace(`/integrations/${integrationId}?newChannel=success`);
-      router.refresh();
+      router.push(`/integrations/${integrationId}?newChannel=success`);
     },
   });
 

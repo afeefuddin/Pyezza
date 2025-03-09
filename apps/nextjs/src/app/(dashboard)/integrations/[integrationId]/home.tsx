@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { TIntegrationWithChannels } from "@repo/types/integration";
-import { Bell, Plus, Settings, X } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import NotificationBanner from "./components/notification-banner";

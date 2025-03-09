@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@repo/database";
 import { SlackApi } from "@repo/lib/slack-api";
 import { z } from "zod";
-import revalidatePathAction from "@/actions/revalidate";
 
 export const GET = withError(
   withUser(async (req, { params }) => {

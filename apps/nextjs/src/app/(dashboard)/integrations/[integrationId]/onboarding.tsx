@@ -123,9 +123,12 @@ export default function Onboarding({
       );
 
       const data = response.data;
-      revalidatePathAction(`/integrations/${integrationId}`, "page");
-      router.replace(`/integrations/${integrationId}`);
       return data;
+    },
+    onSuccess() {
+      revalidatePathAction(`/integrations/${integrationId}`, "page");
+      router.replace(`/integrations/${integrationId}?newChannel=success`);
+      router.refresh();
     },
   });
 

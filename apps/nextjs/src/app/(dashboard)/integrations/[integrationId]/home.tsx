@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { TIntegrationWithChannels } from "@repo/types/integration";
-import { Plus, Settings } from "lucide-react";
+import { Bell, Plus, Settings, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import NotificationBanner from "./components/notification-banner";
 
 function ChannelCard({
   channelName,
@@ -26,7 +27,7 @@ function ChannelCard({
           <div className="text-2xl  truncate font-bold shrink">
             #{channelName}
           </div>
-          <Settings size={20}  />
+          <Settings size={20} />
         </div>
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">
@@ -46,8 +47,13 @@ function ChannelCard({
   );
 }
 
-export default function Home({ data }: { data: TIntegrationWithChannels }) {
-  console.log(data)
+export default function Home({
+  data,
+  newChannel,
+}: {
+  data: TIntegrationWithChannels;
+  newChannel?: string;
+}) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between">
@@ -59,6 +65,7 @@ export default function Home({ data }: { data: TIntegrationWithChannels }) {
           </Button>
         </Link>
       </div>
+      {newChannel === "success" && <NotificationBanner />}
       <div>
         {data.channels.length > 0 ? (
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4">

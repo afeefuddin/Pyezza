@@ -19,10 +19,7 @@ export async function getUser() {
       where: {
         externalProviderId: clerkUser.id,
       },
-      update: {
-        imageUrl: clerkUser.imageUrl,
-        name: clerkUser.fullName,
-      },
+      update: {},
       create: {
         email: clerkUser.emailAddresses[0].emailAddress,
         externalProviderId: clerkUser.id,

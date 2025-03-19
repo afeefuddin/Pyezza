@@ -68,22 +68,24 @@ export default function SidebarDemo({
               {links.map((link, idx) => {
                 if (link.href === "/logout") {
                   return (
-                    <SignOutButton key={idx}>
-                      <SidebarLink
-                        noLink={true}
-                        key={idx}
-                        link={link}
-                        className={cn(
-                          "p-2 text-neutral-700 hover:text-primary group ",
-                          {
-                            "bg-primary/10 rounded text-primary ":
-                              pathname.startsWith(link.href),
-                          }
-                        )}
-                        textClassName={cn("group-hover:text-primary ", {
-                          "text-primary": pathname.startsWith(link.href),
-                        })}
-                      />
+                    <SignOutButton key={idx} redirectUrl="/">
+                      <div>
+                        <SidebarLink
+                          noLink={true}
+                          key={idx}
+                          link={link}
+                          className={cn(
+                            "p-2 text-neutral-700 hover:text-primary group cursor-pointer",
+                            {
+                              "bg-primary/10 rounded text-primary ":
+                                pathname.startsWith(link.href),
+                            }
+                          )}
+                          textClassName={cn("group-hover:text-primary ", {
+                            "text-primary": pathname.startsWith(link.href),
+                          })}
+                        />
+                      </div>
                     </SignOutButton>
                   );
                 }

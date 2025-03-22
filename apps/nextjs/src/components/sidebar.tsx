@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { usePathname } from "next/navigation";
+import { Layers } from "lucide-react";
 
 export default function SidebarDemo({
   children,
@@ -30,16 +31,9 @@ export default function SidebarDemo({
       label: "Integrations",
       href: "/integrations",
       icon: (
-        <IconUserBolt className="group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
+        <Layers className="group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
       ),
     },
-    // {
-    //   label: "Billings",
-    //   href: "/billings",
-    //   icon: (
-    //     <IconSettings className=" group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
-    //   ),
-    // },
     {
       label: "Logout",
       href: "/logout",

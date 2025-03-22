@@ -62,7 +62,6 @@ export class SlackOauth {
       }
       return parsedData;
     } catch (error) {
-      console.log("error here", error);
       return null;
     }
   }

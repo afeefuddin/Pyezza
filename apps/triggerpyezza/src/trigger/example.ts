@@ -76,8 +76,12 @@ function filterChannels(
   return filterChannels;
 }
 
-const buildSpotlightSlackMessage = (content, userId) => {
-  const blocks = [
+const buildSpotlightSlackMessage = (
+  content: string,
+  userId: string,
+  gif?: string | null
+) => {
+  const blocks: Record<string, unknown>[] = [
     {
       type: "section",
       text: {
@@ -89,10 +93,20 @@ const buildSpotlightSlackMessage = (content, userId) => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: content,
+        text: ">" + content,
       },
     },
   ];
+
+  if (gif) {
+    blocks.push({
+      type: "image",
+      block_id: "image4",
+      image_url: gif,
+      alt_text: "",
+    });
+  }
+
   return blocks;
 };
 
@@ -129,7 +143,8 @@ const sendSpotLightMessage = async (
   // Build a message
   const messageToSend = buildSpotlightSlackMessage(
     message.template.content,
-    randomUser
+    randomUser,
+    message.template.gif
   );
   console.log(messageToSend);
   // Send a message
@@ -160,7 +175,7 @@ const sendGenericSocialMessage = async (
     throw new Error("Channel not assigned");
   }
 
-  let messageToSend;
+  let messageToSend: Record<string, unknown>[];
 
   if (message.template.type === "socialsips") {
     messageToSend = [
@@ -175,7 +190,7 @@ const sendGenericSocialMessage = async (
         type: "section",
         text: {
           type: "mrkdwn",
-          text: message.template.content,
+          text: ">" + message.template.content,
         },
       },
     ];
@@ -192,10 +207,19 @@ const sendGenericSocialMessage = async (
         type: "section",
         text: {
           type: "mrkdwn",
-          text: message.template.content,
+          text: ">" + message.template.content,
         },
       },
     ];
+  }
+
+  if (message.template.gif) {
+    messageToSend.push({
+      type: "image",
+      block_id: "image4",
+      image_url: message.template.gif,
+      alt_text: "",
+    });
   }
 
   const messageSlack = await slackApi.sendMessage(

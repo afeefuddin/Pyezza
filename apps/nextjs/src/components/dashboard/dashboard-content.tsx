@@ -32,9 +32,9 @@ export const DashboardContent = () => {
               <Layers className="h-5 w-5 text-orange-500" />
             </div>
           </div>
-          <p className="text-3xl font-bold">
+          <div className="text-3xl font-bold">
             {isLoading ? <Skeleton className="h-9 w-6" /> : data.integrations}
-          </p>
+          </div>
           <p className="text-sm text-gray-500 mt-2">Active connections</p>
         </div>
 
@@ -45,9 +45,9 @@ export const DashboardContent = () => {
               <Hash className="h-5 w-5 text-blue-500" />
             </div>
           </div>
-          <p className="text-3xl font-bold">
+          <div className="text-3xl font-bold">
             {isLoading ? <Skeleton className="h-9 w-6" /> : data.channels}
-          </p>
+          </div>
           <p className="text-sm text-gray-500 mt-2">Across all integrations</p>
         </div>
 
@@ -58,9 +58,9 @@ export const DashboardContent = () => {
               <MessageSquare className="h-5 w-5 text-green-500" />
             </div>
           </div>
-          <p className="text-3xl font-bold">
+          <div className="text-3xl font-bold">
             {isLoading ? <Skeleton className="h-9 w-6" /> : data.messages}
-          </p>
+          </div>
           <p className="text-sm text-gray-500 mt-2">
             {isLoading ? (
               <Skeleton className="h-5 w-24 rounded-sm" />

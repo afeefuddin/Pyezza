@@ -29,7 +29,6 @@ export default function Settings({
   } & Partial<TChannelSetting>;
   integrationId: string;
 }) {
-  console.log(data);
   const [daysOfTheWeek, setDaysOfTheWeek] = useState(data.daysOfWeek ?? []);
   const [timeOfTheDay, setTimeOfTheDay] = useState<Date | undefined>(
     data.timeOfday ? secondToDate(data.timeOfday) : undefined

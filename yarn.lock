@@ -2194,8 +2194,8 @@ __metadata:
   resolution: "@repo/cronpie@workspace:apps/triggerpyezza"
   dependencies:
     "@repo/database": "npm:*"
-    "@trigger.dev/build": "npm:3.3.16"
-    "@trigger.dev/sdk": "npm:3.3.16"
+    "@trigger.dev/build": "npm:3.3.17"
+    "@trigger.dev/sdk": "npm:3.3.17"
     "@types/cors": "npm:^2.8.15"
     "@types/express": "npm:^4.17.20"
     "@types/morgan": "npm:^1.9.7"
@@ -2365,21 +2365,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trigger.dev/build@npm:3.3.16":
-  version: 3.3.16
-  resolution: "@trigger.dev/build@npm:3.3.16"
+"@trigger.dev/build@npm:3.3.17":
+  version: 3.3.17
+  resolution: "@trigger.dev/build@npm:3.3.17"
   dependencies:
-    "@trigger.dev/core": "npm:3.3.16"
+    "@trigger.dev/core": "npm:3.3.17"
     pkg-types: "npm:^1.1.3"
     tinyglobby: "npm:^0.2.2"
     tsconfck: "npm:3.1.3"
-  checksum: 10c0/6d1c5dc36a1c5619ba347166d73bfa5f5ac7bd77c5e1efe6a795386988e7cb82954a3156d3dbc686511038d0a4744ec0a1ad400393d7d4840b8e974adf110307
+  checksum: 10c0/a9ded15114f4d03f2fda35ef057a6726b11c215d47aa34353a6bfcbc5bd7786722ae6e9edc5e9dc9af554a81b1d2a3d7012e1895c64484c08d09e231f0daaa4f
   languageName: node
   linkType: hard
 
-"@trigger.dev/core@npm:3.3.16":
-  version: 3.3.16
-  resolution: "@trigger.dev/core@npm:3.3.16"
+"@trigger.dev/core@npm:3.3.17":
+  version: 3.3.17
+  resolution: "@trigger.dev/core@npm:3.3.17"
   dependencies:
     "@electric-sql/client": "npm:1.0.0-beta.1"
     "@google-cloud/precise-date": "npm:^4.0.0"
@@ -2407,18 +2407,18 @@ __metadata:
     zod: "npm:3.23.8"
     zod-error: "npm:1.5.0"
     zod-validation-error: "npm:^1.5.0"
-  checksum: 10c0/3bf2c7b750be8f6f4cc2274a2aa9766e0bfcc5f63c149550d889249b6be607949592a75ed3b74f7cfbf615f833fff44812882e12e2767e60af6fa237e080baaa
+  checksum: 10c0/3e32a47c0d1043b9e3d395e5ac86c2cecdb0988176ada3840f2c10c01bce8cddf27a026fe8bdf64a3d411b31afb4ac160a6f7dc9efd0db8ac13bc286da72eeb6
   languageName: node
   linkType: hard
 
-"@trigger.dev/sdk@npm:3.3.16":
-  version: 3.3.16
-  resolution: "@trigger.dev/sdk@npm:3.3.16"
+"@trigger.dev/sdk@npm:3.3.17":
+  version: 3.3.17
+  resolution: "@trigger.dev/sdk@npm:3.3.17"
   dependencies:
     "@opentelemetry/api": "npm:1.9.0"
     "@opentelemetry/api-logs": "npm:0.52.1"
     "@opentelemetry/semantic-conventions": "npm:1.25.1"
-    "@trigger.dev/core": "npm:3.3.16"
+    "@trigger.dev/core": "npm:3.3.17"
     chalk: "npm:^5.2.0"
     cronstrue: "npm:^2.21.0"
     debug: "npm:^4.3.4"
@@ -2431,7 +2431,7 @@ __metadata:
     ws: "npm:^8.11.0"
   peerDependencies:
     zod: ^3.0.0
-  checksum: 10c0/9ede95c7c7307433a1489971cdba9b2ab8d1fd47617ebdd84877dbab96ce8e113895b5a8bb7bf51132e11e7a82f8ef068665521dc331d6a919b0e3fc4d512362
+  checksum: 10c0/16ca3da4209adbf1f5e176b2540f3184a66b3b658085d6948fb70083ea4e22f21e6921055224403439342a8b46f1def4cd5df041454f5006f960e85abd7e849d
   languageName: node
   linkType: hard
 

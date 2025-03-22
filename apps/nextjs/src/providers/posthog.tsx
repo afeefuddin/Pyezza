@@ -6,7 +6,6 @@ import { usePostHog } from "posthog-js/react";
 
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { useUser } from "@clerk/nextjs";
 import useClientUser from "@/hooks/use-client-user";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
@@ -35,7 +34,6 @@ function PostHogPageView() {
 
   useEffect(() => {
     if (!user) return;
-    console.log(user)
     posthog.identify(user.email);
   }, [user, posthog]);
 

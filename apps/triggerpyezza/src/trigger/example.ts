@@ -55,7 +55,7 @@ function filterChannels(
     }
 
     // if it's the right time to send the message
-    const startTime = channel.setting.timeOfday - 20 * 60;
+    const startTime = channel.setting.timeOfday - 10 * 60;
     const endTime = channel.setting.timeOfday + 15 * 60;
     const currentTime = dateToSeconds(date);
     if (currentTime < startTime || currentTime > endTime) {

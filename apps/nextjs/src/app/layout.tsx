@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "@/components/providers/providers";
 
 const geistSans = Geist({
@@ -16,8 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pyezza",
-  description: "A social bot for teams",
+  metadataBase: new URL("https://pyezza.live"),
+  title: "A social slack bot to spark engagement across teams",
+  description:
+    "Pyezza is your ultimate Slack companion for fostering a fun, engaging, and healthy workplace culture.",
+  openGraph: {
+    title: "Pyezza - The Social Slack Integration Bot",
+    url: "https://pyezza.live",
+    siteName: "Pyezza",
+    description:
+      "Pyezza is your ultimate Slack companion for fostering a fun, engaging, and healthy workplace culture.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+  },
 };
 
 export default function RootLayout({
@@ -26,14 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <Providers>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
         </body>
-      </html>
-    </Providers>
+      </Providers>
+    </html>
   );
 }

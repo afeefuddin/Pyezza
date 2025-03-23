@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pyezza.live"),
-  title: "A social slack bot to spark engagement across teams",
+  title: "Pyezza",
   description:
     "Pyezza is your ultimate Slack companion for fostering a fun, engaging, and healthy workplace culture.",
   openGraph: {
-    title: "Pyezza - The Social Slack Integration Bot",
+    title: "Pyezza",
     url: "https://pyezza.live",
     siteName: "Pyezza",
     description:

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { z } from "zod";
+import { decrypt } from "./encrypt";
 
 export const slackChannelsResponseSchema = z.object({
   channels: z.array(
@@ -30,7 +31,7 @@ export class SlackApi {
   private headers: { Authorization: string };
 
   constructor(token: string) {
-    this.token = token;
+    this.token = decrypt(token);
     this.headers = {
       Authorization: `Bearer ${this.token}`,
     };

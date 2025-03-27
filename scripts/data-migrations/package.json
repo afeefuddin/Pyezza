@@ -1,0 +1,13 @@
+{
+    "name": "data-migrations",
+    "packageManager": "yarn@4.6.0",
+    "scripts": {
+        "start": "yarn with-env ts-node src/index.ts",
+        "with-env": "yarn run dotenv -e ../../.env"
+    },
+    "devDependencies": {
+        "dotenv-cli": "latest",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3"
+    }
+}

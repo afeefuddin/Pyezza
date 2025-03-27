@@ -137,8 +137,13 @@ const sendSpotLightMessage = async (
     (value) => value !== message.channel.integration.botUserId
   );
 
+  // Check if there are members left after filtering
+  if (members.length === 0) {
+    throw new Error("No valid users in the channel after filtering");
+  }
+
   // Pick random User
-  const randomUser = members[Math.round(Math.random() * 10) % members.length];
+  const randomUser = members[Math.floor(Math.random() * members.length)];
 
   // Build a message
   const messageToSend = buildSpotlightSlackMessage(

@@ -12,7 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { slackChannelsResponseSchema } from "@repo/lib/slack-api";
 import {
   Select,
   SelectGroup,
@@ -21,6 +20,17 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
+import { z } from "zod";
+
+const slackChannelsResponseSchema = z.object({
+  channels: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+    })
+  ),
+});
+
 const featureDetails = {
   intros: {
     title: "Team Introductions Channel",

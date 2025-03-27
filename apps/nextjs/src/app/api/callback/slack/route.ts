@@ -3,6 +3,7 @@ import { SlackOauth } from "@/lib/slack-oauth";
 import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
 import { prisma } from "@repo/database";
+import { encrypt } from "@repo/lib/encrypt";
 
 export async function GET(request: NextRequest) {
   const user = await getUser();
@@ -35,13 +36,13 @@ export async function GET(request: NextRequest) {
       teamId: data.team.id,
     },
     update: {
-      token: data.access_token,
+      token: encrypt(data.access_token),
     },
     create: {
       teamId: data.team.id,
       teamName: data.team.name,
       type: "slack",
-      token: data.access_token,
+      token: encrypt(data.access_token),
       botUserId: data.bot_user_id,
       appId: data.app_id,
       scope: data.scope,

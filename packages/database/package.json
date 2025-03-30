@@ -11,7 +11,7 @@
     "db:generate": "yarn with-env prisma generate",
     "db:push": "yarn with-env prisma db push --skip-generate",
     "db:deploy": "yarn with-env prisma migrate deploy",
-    "db:migrate": "yarn with-env prisma db migrate dev",
+    "db:migrate": "yarn with-env npx prisma db migrate dev",
     "with-env": "yarn run dotenv -e ../../.env"
   },
   "dependencies": {

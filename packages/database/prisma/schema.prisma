@@ -83,16 +83,17 @@ model ChannelSetting {
 }
 
 model Channel {
-  id            Int             @id @default(autoincrement())
-  publicId      String          @unique @default(nanoid(12))
-  active        Boolean         @default(true)
+  id            Int                    @id @default(autoincrement())
+  publicId      String                 @unique @default(nanoid(12))
+  active        Boolean                @default(true)
   channelId     String?
   channelName   String?
   type          ChannelType
-  integration   Integration     @relation(fields: [integrationId], references: [id])
+  integration   Integration            @relation(fields: [integrationId], references: [id])
   integrationId Int
   setting       ChannelSetting?
   Message       Message[]
+  queue         SpotlightMessageQueue?
 }
 
 model MessageTemplate {
@@ -117,4 +118,13 @@ model Message {
   updatedAt         DateTime        @updatedAt
   messageTemplateId Int
   status            MessageStatus   @default(PENDING)
+}
+
+model SpotlightMessageQueue {
+  id        Int      @id @default(autoincrement())
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId Int
+  members   String[]
+
+  @@unique([channelId])
 }

@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "npx trigger.dev@latest dev",
     "dev": "npx trigger.dev@latest dev",
+    "deploy": "npx trigger.dev@latest deploy",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import { prisma } from "@repo/database";
+import { SpotlightService } from "@repo/services/spotlight.service";
 import { logger, schedules, task, wait } from "@trigger.dev/sdk/v3";
 import {
   TChannel,
@@ -9,7 +10,6 @@ import { TMessage } from "@repo/types/message";
 import { TMessageTemplate } from "@repo/types/messageTemplate";
 import { dateToSeconds } from "@repo/lib/date";
 import { SlackApi } from "@repo/lib/slack-api";
-
 function filterChannels(
   channels: TChannelWithSettingAndMessage[]
 ): TChannelWithSettingAndMessage[] {
@@ -24,8 +24,6 @@ function filterChannels(
     const date = new Date(
       new Date().toLocaleString("en-US", { timeZone: timezone })
     );
-
-    console.log(date);
 
     let today = date.getDay() - 1;
     if (today < 0) {
@@ -76,40 +74,6 @@ function filterChannels(
   return filterChannels;
 }
 
-const buildSpotlightSlackMessage = (
-  content: string,
-  userId: string,
-  gif?: string | null
-) => {
-  const blocks: Record<string, unknown>[] = [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `🌟 The Spotlight is on <@${userId}>🌟`,
-      },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: ">" + content,
-      },
-    },
-  ];
-
-  if (gif) {
-    blocks.push({
-      type: "image",
-      block_id: "image4",
-      image_url: gif,
-      alt_text: "",
-    });
-  }
-
-  return blocks;
-};
-
 const sendSpotLightMessage = async (
   message: TMessage & {
     channel: TChannelWithIntegration;
@@ -117,55 +81,28 @@ const sendSpotLightMessage = async (
   },
   slackApi: SlackApi
 ) => {
-  // Fetch Users
-  if (!message.channel.channelId) {
-    throw new Error("Channel not assigned");
-  }
-  const users = await slackApi.getUsersInChannel(message.channel.channelId);
-
-  if (!users.ok) {
-    throw new Error("Error fetching users" + users.error);
-  }
-
-  let members = users.members;
-  if (members.length === 0) {
-    throw new Error("No users in the channel");
-  }
-
-  // remove Pyezza from members :)
-  members = members.filter(
-    (value) => value !== message.channel.integration.botUserId
+  const spotlight = new SpotlightService(
+    message.channel.id,
+    message.channel.channelId!,
+    slackApi,
+    message.channel.integration.botUserId!
   );
 
-  // Check if there are members left after filtering
-  if (members.length === 0) {
-    throw new Error("No valid users in the channel after filtering");
-  }
-
-  // Pick random User
-  const randomUser = members[Math.floor(Math.random() * members.length)];
-
-  // Build a message
-  const messageToSend = buildSpotlightSlackMessage(
-    message.template.content,
-    randomUser,
-    message.template.gif
+  const userToTag = await spotlight.popNextUser();
+  const messageToSend = await spotlight.buildSlackMessage(
+    message.template,
+    userToTag
   );
-  console.log(messageToSend);
-  // Send a message
 
-  const messageSlack = await slackApi.sendMessage(
+  const result = await slackApi.sendMessage(
     messageToSend,
-    message.channel.channelId
+    message.channel.channelId!
   );
 
-  if (!messageSlack.ok) {
-    const errorMessage =
-      "Error message seding failed: " +
-      messageSlack.error +
-      " id: " +
-      message.channel!.channelId;
-    throw new Error(errorMessage);
+  if (!result.ok) {
+    throw new Error(
+      `Error sending spotlight message: ${result.error}, channel: ${message.channel.channelId}`
+    );
   }
 };
 
@@ -244,7 +181,7 @@ const sendGenericSocialMessage = async (
 
 export const sendSlackMessage = task({
   id: "send-message-slack",
-  run: async (payload: { id: number; messageId: number }) => {
+  run: async (payload: { messageId: number }) => {
     const message = await prisma.message.findUnique({
       where: {
         id: payload.messageId,
@@ -350,7 +287,6 @@ export const sendMessageTask = task({
 
         // Queue the actual message sending
         await sendSlackMessage.trigger({
-          id: channel.id,
           messageId: message.id,
         });
       });

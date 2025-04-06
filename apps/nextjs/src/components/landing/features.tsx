@@ -7,23 +7,23 @@ export default function Features() {
             Awesome features to spark conversations
           </div>
           <div className="flex flex-col gap-8 lg:grid lg:grid-cols-3 ">
-            <div className="gap-2 flex flex-col">
+            <div className="gap-2 flex flex-col bg-white p-8 rounded-md border border-gray-200 shadow hover:shadow-lg transition-all">
               <div className="text-xl font-semibold">🍹 Social Sips</div>
-              <div className=" text-sm text-muted-foreground">
+              <div className="text-muted-foreground">
                 Random Activity Starter. Participate in activities virtually
                 with teams.
               </div>
             </div>
-            <div className="gap-2 flex flex-col">
+            <div className="gap-2 flex flex-col bg-white p-8 rounded-md border border-gray-200 shadow hover:shadow-lg transition-all">
               <div className="text-xl font-semibold">🎭 Would You Rather</div>
-              <div className=" text-sm text-muted-foreground">
+              <div className="text-muted-foreground">
                 Know colleagues opinion about thing that they would choose over
                 the other.
               </div>
             </div>
-            <div className="gap-2 flex flex-col">
+            <div className="gap-2 flex flex-col bg-white p-8 rounded-md border border-gray-200 shadow hover:shadow-lg transition-all">
               <div className="text-xl font-semibold">🔍 SpotLight</div>
-              <div className=" text-sm text-muted-foreground">
+              <div className="  text-muted-foreground">
                 Put People on the spot and get to know about them via spotlight.
               </div>
             </div>

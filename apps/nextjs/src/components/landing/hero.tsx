@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HeroRight from "./hero-right";
 
 export default function Hero() {
   return (
@@ -44,28 +45,9 @@ export default function Hero() {
                 Get Started Free
               </Link>
             </div>
-            {/* <div
-              className="mt-8 text-gray-400 flex items-center gap-4 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-3s"
-              id="el-j4eg6rpv"
-            >
-              <div className="flex -space-x-2" id="el-23316wgd">
-                <div
-                  className="w-8 h-8 rounded-full bg-primary"
-                  id="el-j20mdrkv"
-                ></div>
-                <div
-                  className="w-8 h-8 rounded-full bg-orange-400"
-                  id="el-9daz09i5"
-                ></div>
-                <div
-                  className="w-8 h-8 rounded-full bg-orange-300"
-                  id="el-z82gmcvp"
-                ></div>
-              </div>
-              <span id="el-r3gwrklz">1000+ teams already using Pyezza</span>
-            </div> */}
           </div>
-          <div
+          <HeroRight />
+          {/* <div
             className="relative animate__animated animate__fadeInRight"
             id="el-00o17zm3"
           >
@@ -128,7 +110,7 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

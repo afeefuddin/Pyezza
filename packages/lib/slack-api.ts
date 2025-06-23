@@ -99,6 +99,7 @@ export class SlackApi {
       .discriminatedUnion("ok", [
         z.object({
           ok: z.literal(true),
+          ts: z.string(),
         }),
         z.object({
           ok: z.literal(false),

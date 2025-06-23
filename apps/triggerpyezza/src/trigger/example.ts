@@ -1,183 +1,11 @@
 import { prisma } from "@repo/database";
-import { SpotlightService } from "@repo/services/spotlight.service";
 import { logger, schedules, task, wait } from "@trigger.dev/sdk/v3";
-import {
-  TChannel,
-  TChannelWithIntegration,
-  TChannelWithSettingAndMessage,
-} from "@repo/types/channel";
-import { TMessage } from "@repo/types/message";
 import { TMessageTemplate } from "@repo/types/messageTemplate";
-import { dateToSeconds } from "@repo/lib/date";
 import { SlackApi } from "@repo/lib/slack-api";
-function filterChannels(
-  channels: TChannelWithSettingAndMessage[]
-): TChannelWithSettingAndMessage[] {
-  const filterChannels: TChannelWithSettingAndMessage[] = [];
-
-  channels.forEach((channel) => {
-    if (!channel.setting) {
-      console.log("Disappointing");
-      return;
-    }
-    const timezone = channel.setting.timezone;
-    const date = new Date(
-      new Date().toLocaleString("en-US", { timeZone: timezone })
-    );
-
-    let today = date.getDay() - 1;
-    if (today < 0) {
-      today = 6;
-    }
-
-    // If Eligible to send message today
-    if (!channel.setting.daysOfWeek.includes(today)) {
-      console.log("Did not match the date");
-      return;
-    }
-
-    // If last message sent was today
-    if (channel.Message[0]) {
-      const lastMessageDateLocal = new Date(
-        channel.Message[0].createdAt.toLocaleString("en-US", {
-          timeZone: timezone,
-        })
-      );
-      const dupDate = new Date(date);
-      if (
-        lastMessageDateLocal.setHours(0, 0, 0, 0) ===
-        dupDate.setHours(0, 0, 0, 0)
-      ) {
-        return;
-      }
-    }
-
-    // if it's the right time to send the message
-    const startTime = channel.setting.timeOfday - 10 * 60;
-    const endTime = channel.setting.timeOfday + 15 * 60;
-    const currentTime = dateToSeconds(date);
-    if (currentTime < startTime || currentTime > endTime) {
-      console.log(
-        "Did not match the time",
-        date,
-        currentTime,
-        startTime,
-        endTime,
-        channel.channelName
-      );
-      return;
-    }
-
-    filterChannels.push(channel);
-  });
-
-  return filterChannels;
-}
-
-const sendSpotLightMessage = async (
-  message: TMessage & {
-    channel: TChannelWithIntegration;
-    template: TMessageTemplate;
-  },
-  slackApi: SlackApi
-) => {
-  const spotlight = new SpotlightService(
-    message.channel.id,
-    message.channel.channelId!,
-    slackApi,
-    message.channel.integration.botUserId!
-  );
-
-  const userToTag = await spotlight.popNextUser();
-  const messageToSend = await spotlight.buildSlackMessage(
-    message.template,
-    userToTag
-  );
-
-  const result = await slackApi.sendMessage(
-    messageToSend,
-    message.channel.channelId!
-  );
-
-  if (!result.ok) {
-    throw new Error(
-      `Error sending spotlight message: ${result.error}, channel: ${message.channel.channelId}`
-    );
-  }
-};
-
-const sendGenericSocialMessage = async (
-  message: TMessage & {
-    channel: TChannelWithIntegration;
-    template: TMessageTemplate;
-  },
-  slackApi: SlackApi
-) => {
-  if (!message.channel.channelId) {
-    throw new Error("Channel not assigned");
-  }
-
-  let messageToSend: Record<string, unknown>[];
-
-  if (message.template.type === "socialsips") {
-    messageToSend = [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "🥤 *Time for a social sip* 🥤",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: ">" + message.template.content,
-        },
-      },
-    ];
-  } else {
-    messageToSend = [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*Would you rather* 🤔",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: ">" + message.template.content,
-        },
-      },
-    ];
-  }
-
-  if (message.template.gif) {
-    messageToSend.push({
-      type: "image",
-      block_id: "image4",
-      image_url: message.template.gif,
-      alt_text: "",
-    });
-  }
-
-  const messageSlack = await slackApi.sendMessage(
-    messageToSend,
-    message.channel.channelId
-  );
-
-  if (!messageSlack.ok) {
-    const errorMessage =
-      "Error message seding failed: " +
-      messageSlack.error +
-      " id: " +
-      message.channel!.channelId;
-    throw new Error(errorMessage);
-  }
-};
+import { filterChannels, filterReminderMessages } from "../utils";
+import { sendGenericSocialMessage, sendSpotLightMessage } from "../sendMessage";
+import { TMessageWithChannelIdAndReminderSettings } from "@repo/types/message";
+import { response } from "express";
 
 export const sendSlackMessage = task({
   id: "send-message-slack",
@@ -214,11 +42,18 @@ export const sendSlackMessage = task({
     }
 
     const slackApi = new SlackApi(channel.integration.token);
+    let taggedMembers: string[] = [];
+    let result: {
+      ok: true;
+      ts: string;
+    } | null = null;
 
     if (message.template.type === "spotlight") {
-      await sendSpotLightMessage(message, slackApi);
+      const response = await sendSpotLightMessage(message, slackApi);
+      taggedMembers = response.taggedMembers;
+      result = response.result;
     } else {
-      await sendGenericSocialMessage(message, slackApi);
+      result = await sendGenericSocialMessage(message, slackApi);
     }
 
     try {
@@ -228,10 +63,12 @@ export const sendSlackMessage = task({
         },
         data: {
           status: "SENT",
+          taggedMembers,
+          sent_ts: result.ts,
         },
       });
     } catch (error) {
-      logger.warn("ERROR Updating the message");
+      logger.warn("ERROR: Updating or Sending the message");
     }
   },
 });
@@ -297,6 +134,26 @@ export const sendMessageTask = task({
   },
 });
 
+export const sendReminder = task({
+  id: "send-reminder",
+  run: async (payload: TMessageWithChannelIdAndReminderSettings) => {
+    try {
+      let reminder = await prisma.reminder.findFirst({
+        where: {
+          messageId: payload.id,
+        },
+      });
+      if (!reminder) {
+        reminder = await prisma.reminder.create({
+          data: {
+            messageId: payload.id,
+          },
+        });
+      }
+    } catch (error) {}
+  },
+});
+
 export const firstScheduledTask = schedules.task({
   id: "first-scheduled-task",
   cron: "*/15 * * * *",
@@ -318,7 +175,6 @@ export const firstScheduledTask = schedules.task({
         },
       });
       const channelsToProcess = filterChannels(channels);
-      console.log(channelsToProcess);
       await Promise.all(
         channelsToProcess.map((channel) =>
           sendMessageTask
@@ -328,6 +184,48 @@ export const firstScheduledTask = schedules.task({
             )
         )
       );
+
+      const reminderMessages = await prisma.message.findMany({
+        where: {
+          AND: [
+            {
+              status: "SENT",
+            },
+            {
+              Reminder: {
+                none: {},
+              },
+            },
+            {
+              channel: {
+                type: "spotlight",
+              },
+            },
+            {
+              createdAt: {
+                gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+              },
+            },
+          ],
+        },
+        include: {
+          channel: {
+            select: {
+              channelId: true,
+            },
+            include: {
+              setting: {
+                select: {
+                  reminderInterval: true,
+                  reminderMessage: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const reminderToProcess = filterReminderMessages(reminderMessages);
     } catch (error: any) {
       logger.error("Error in messageScheduler:", error);
       throw error;

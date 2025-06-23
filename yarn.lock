@@ -2441,6 +2441,7 @@ __metadata:
     "@trigger.dev/sdk": "npm:3.3.17"
     "@types/cors": "npm:^2.8.15"
     "@types/express": "npm:^4.17.20"
+    "@types/minimalistic-assert": "npm:^1"
     "@types/morgan": "npm:^1.9.7"
     "@types/node": "npm:^20.8.10"
     bullmq: "npm:^5.34.10"
@@ -2450,6 +2451,7 @@ __metadata:
     express: "npm:^4.18.2"
     helmet: "npm:^7.0.0"
     ioredis: "npm:^5.4.2"
+    minimalistic-assert: "npm:^1.0.1"
     moment: "npm:^2.30.1"
     morgan: "npm:^1.10.0"
     nodemon: "npm:^3.0.1"
@@ -2958,6 +2960,13 @@ __metadata:
   version: 1.3.5
   resolution: "@types/mime@npm:1.3.5"
   checksum: 10c0/c2ee31cd9b993804df33a694d5aa3fa536511a49f2e06eeab0b484fef59b4483777dbb9e42a4198a0809ffbf698081fdbca1e5c2218b82b91603dfab10a10fbc
+  languageName: node
+  linkType: hard
+
+"@types/minimalistic-assert@npm:^1":
+  version: 1.0.3
+  resolution: "@types/minimalistic-assert@npm:1.0.3"
+  checksum: 10c0/11f72159b1d9a19a4722fba83bfa7f3bb7e443a4b9da91bdb4a1a06cf411def5ca9cb1fc62ce6a909b8bc05cac36311662a9c28b0135b57acb333ba1569add19
   languageName: node
   linkType: hard
 
@@ -6694,6 +6703,13 @@ __metadata:
   version: 2.2.3
   resolution: "minimal-polyfills@npm:2.2.3"
   checksum: 10c0/de8668b7441afc7b691028a9488744e6ead371dbfffdd29b9dd30764984aff4ad95f54c5ceabe8044f6a639da6be2f4047ead3ee8734536701029c7652e87ee5
+  languageName: node
+  linkType: hard
+
+"minimalistic-assert@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "minimalistic-assert@npm:1.0.1"
+  checksum: 10c0/96730e5601cd31457f81a296f521eb56036e6f69133c0b18c13fe941109d53ad23a4204d946a0d638d7f3099482a0cec8c9bb6d642604612ce43ee536be3dddd
   languageName: node
   linkType: hard
 

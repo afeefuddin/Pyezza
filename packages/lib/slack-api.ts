@@ -86,14 +86,24 @@ export class SlackApi {
     return parsedData;
   }
 
-  async sendMessage(blocks: unknown[], channelId: string) {
+  async sendMessage(blocks: unknown[], channelId: string, ts?: string | null) {
+    const searchParams = new URLSearchParams({
+      channel: channelId,
+      blocks: encodeURIComponent(JSON.stringify(blocks)),
+    });
+
+    if (ts) {
+      searchParams.append("thread_ts", ts);
+    }
+
     const response = await axios.post(
-      `${this.url}/chat.postMessage?channel=${channelId}&blocks=${encodeURIComponent(JSON.stringify(blocks))}`,
+      `${this.url}/chat.postMessage?${searchParams.toString()}`,
       null,
       {
         headers: this.headers,
       }
     );
+
     const rawData = response.data;
     const parsedData = z
       .discriminatedUnion("ok", [
@@ -132,6 +142,71 @@ export class SlackApi {
         }),
       ])
       .parse(rawData);
+    return parsedData;
+  }
+
+  async getMessageHistory(channelId: string, oldest: string) {
+    const response = await axios.get(
+      `${this.url}/conversations.history?channel=${channelId}&oldest=${oldest}`,
+      {
+        headers: this.headers,
+      }
+    );
+    const rawData = response.data;
+    const parsedData = z
+      .discriminatedUnion("ok", [
+        z.object({
+          ok: z.literal(true),
+          messages: z.array(
+            z.object({
+              user: z.string().optional(),
+            })
+          ),
+        }),
+        z.object({
+          ok: z.literal(false),
+          error: z.string(),
+        }),
+      ])
+      .parse(rawData);
+
+    if (!parsedData.ok) {
+      throw new Error(`Error fetching message history: ${parsedData.error}`);
+    }
+    return parsedData;
+  }
+
+  async getReplies(channelId: string, ts: string, oldest: string) {
+    const reponse = await axios.get(
+      `${this.url}/conversations.replies?channel=${channelId}&ts=${ts}&oldest=${oldest}`,
+      {
+        headers: this.headers,
+      }
+    );
+
+    const rawData = reponse.data;
+
+    const parsedData = z
+      .discriminatedUnion("ok", [
+        z.object({
+          ok: z.literal(true),
+          messages: z.array(
+            z.object({
+              user: z.string().optional(),
+            })
+          ),
+        }),
+        z.object({
+          ok: z.literal(false),
+          error: z.string(),
+        }),
+      ])
+      .parse(rawData);
+
+    if (!parsedData.ok) {
+      throw new Error("Failed to get replies");
+    }
+
     return parsedData;
   }
 }

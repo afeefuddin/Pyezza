@@ -2,10 +2,18 @@ import { prisma } from "@repo/database";
 import { logger, schedules, task, wait } from "@trigger.dev/sdk/v3";
 import { TMessageTemplate } from "@repo/types/messageTemplate";
 import { SlackApi } from "@repo/lib/slack-api";
-import { filterChannels, filterReminderMessages } from "../utils";
-import { sendGenericSocialMessage, sendSpotLightMessage } from "../sendMessage";
-import { TMessageWithChannelIdAndReminderSettings } from "@repo/types/message";
-import { response } from "express";
+import {
+  filterChannels,
+  filterReminderMessages,
+  findTaggedMemberReplyInHistory,
+} from "../utils";
+import {
+  sendGenericSocialMessage,
+  sendReminderMessage,
+  sendSpotLightMessage,
+} from "../sendMessage";
+import { dateToSeconds } from "@repo/lib/date";
+import assert from "minimalistic-assert";
 
 export const sendSlackMessage = task({
   id: "send-message-slack",
@@ -134,10 +142,154 @@ export const sendMessageTask = task({
   },
 });
 
+export const sendSlackReminder = task({
+  id: "send-reminder-slack",
+  run: async (payload: { reminderId: number }) => {
+    const reminder = await prisma.reminder.findUnique({
+      where: {
+        id: payload.reminderId,
+      },
+      select: {
+        message: {
+          select: {
+            id: true,
+            channel: {
+              select: {
+                channelId: true,
+                integration: {
+                  select: {
+                    token: true,
+                  },
+                },
+              },
+            },
+            sent_ts: true,
+            taggedMembers: true,
+          },
+        },
+      },
+    });
+
+    if (!reminder) {
+      logger.error(`Reminder ${payload.reminderId} not found`);
+      return;
+    }
+
+    if (!reminder.message.channel.integration.token) {
+      logger.error(
+        `Integration token not found for reminder ${payload.reminderId}`
+      );
+      return;
+    }
+    if (!reminder.message.channel.channelId) {
+      logger.error(`Channel ID not found for reminder ${payload.reminderId}`);
+      return;
+    }
+
+    const slackApi = new SlackApi(reminder.message.channel.integration.token);
+    const data = await sendReminderMessage(
+      {
+        userId: reminder.message.taggedMembers[0],
+        channelId: reminder.message.channel.channelId,
+        ts: reminder.message.sent_ts,
+      },
+      slackApi
+    );
+
+    if (data.ok) {
+      await prisma.reminder.update({
+        where: {
+          id: payload.reminderId,
+        },
+        data: {
+          status: "SENT",
+          sent_ts: data.ts,
+        },
+      });
+
+      await prisma.message.update({
+        where: {
+          id: reminder.message.id,
+        },
+        data: {
+          eligibleForReminder: false,
+        },
+      });
+    }
+  },
+});
+
 export const sendReminder = task({
   id: "send-reminder",
-  run: async (payload: TMessageWithChannelIdAndReminderSettings) => {
+  run: async (payload: { id: number }) => {
     try {
+      const message = await prisma.message.findUnique({
+        where: {
+          id: payload.id,
+        },
+        select: {
+          sent_ts: true,
+          createdAt: true,
+          taggedMembers: true,
+          channel: {
+            select: {
+              integration: {
+                select: {
+                  token: true,
+                },
+              },
+              channelId: true,
+            },
+          },
+        },
+      });
+
+      if (!message) {
+        logger.error(`Message ${payload.id} not found`);
+        return;
+      }
+
+      assert(message.channel.integration.token);
+      assert(message.channel.channelId);
+      assert(message.sent_ts, "Sent timestamp is required");
+
+      const slackApi = new SlackApi(message.channel.integration.token);
+      const oldest = dateToSeconds(new Date(message.createdAt)).toString();
+      const history = await slackApi.getMessageHistory(
+        message.channel.channelId,
+        oldest
+      );
+
+      let found = findTaggedMemberReplyInHistory(
+        message.taggedMembers,
+        history.messages
+      );
+
+      if (found) {
+        logger.info(
+          `Found tagged member reply in history for message ${payload.id}`
+        );
+        return;
+      }
+
+      const replies = await slackApi.getReplies(
+        message.channel.channelId!,
+        message.sent_ts,
+        oldest
+      );
+
+      found = findTaggedMemberReplyInHistory(
+        message.taggedMembers,
+        replies.messages
+      );
+
+      if (found) {
+        logger.info(
+          `Found tagged member reply in history for message ${payload.id}`
+        );
+        return;
+      }
+
       let reminder = await prisma.reminder.findFirst({
         where: {
           messageId: payload.id,
@@ -150,7 +302,13 @@ export const sendReminder = task({
           },
         });
       }
-    } catch (error) {}
+
+      await sendSlackReminder.trigger({
+        reminderId: reminder.id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   },
 });
 
@@ -206,18 +364,24 @@ export const firstScheduledTask = schedules.task({
                 gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
               },
             },
+            {
+              eligibleForReminder: true,
+            },
           ],
         },
         include: {
           channel: {
             select: {
               channelId: true,
-            },
-            include: {
+              integration: {
+                select: {
+                  token: true,
+                },
+              },
               setting: {
                 select: {
-                  reminderInterval: true,
                   reminderMessage: true,
+                  reminderInterval: true,
                 },
               },
             },

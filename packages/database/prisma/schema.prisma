@@ -113,17 +113,18 @@ model MessageTemplate {
 }
 
 model Message {
-  id                Int             @id @default(autoincrement())
-  channelId         Int
-  channel           Channel         @relation(fields: [channelId], references: [id])
-  template          MessageTemplate @relation(fields: [messageTemplateId], references: [id])
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  messageTemplateId Int
-  status            MessageStatus   @default(PENDING)
-  sent_ts           String? // Provided by the integration
-  taggedMembers     String[]        @default([])
-  Reminder          Reminder[]
+  id                  Int             @id @default(autoincrement())
+  channelId           Int
+  channel             Channel         @relation(fields: [channelId], references: [id])
+  template            MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  messageTemplateId   Int
+  status              MessageStatus   @default(PENDING)
+  sent_ts             String? // Provided by the integration
+  taggedMembers       String[]        @default([])
+  Reminder            Reminder[]
+  eligibleForReminder Boolean         @default(true)
 }
 
 model SpotlightMessageQueue {

@@ -86,3 +86,20 @@ export function filterReminderMessages(
     return true;
   });
 }
+
+// Check for only 1 reply from tagged members in the history for any 1 of the taggedMember
+export function findTaggedMemberReplyInHistory(
+  taggedMembers: string[],
+  messages: { user?: string | undefined }[]
+) {
+  for (const message of messages) {
+    if (!message.user) {
+      continue;
+    }
+    if (taggedMembers.includes(message.user)) {
+      return true;
+    }
+  }
+
+  return false;
+}

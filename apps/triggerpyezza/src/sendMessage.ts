@@ -113,4 +113,40 @@ const sendGenericSocialMessage = async (
   return messageSlack;
 };
 
-export { sendGenericSocialMessage, sendSpotLightMessage };
+const sendReminderMessage = async (
+  {
+    userId,
+    channelId,
+    ts,
+  }: { userId: string | null; channelId: string; ts: string | null },
+  slackApi: SlackApi
+) => {
+  const blocks: Record<string, unknown>[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Hey <@${userId}>! 🌸 I thoughtfully gathered these messages just for you! ✨`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "Please consider replying 👉👈🥺",
+      },
+    },
+  ];
+
+  const data = await slackApi.sendMessage(blocks, channelId, ts);
+
+  if (!data.ok) {
+    throw new Error(
+      `Error sending reminder message: ${data.error}, channel: ${channelId}`
+    );
+  }
+
+  return data;
+};
+
+export { sendGenericSocialMessage, sendSpotLightMessage, sendReminderMessage };

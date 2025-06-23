@@ -9,5 +9,8 @@ export type TMessageWithChannelIdAndReminderSettings = TMessage & {
       reminderMessage: string | null;
       reminderInterval: number;
     } | null;
+    integration: {
+      token: string | null;
+    };
   };
 };

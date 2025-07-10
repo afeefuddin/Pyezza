@@ -26,7 +26,7 @@ export class SpotlightService {
         type: "section",
         text: {
           type: "mrkdwn",
-          text:  content,
+          text: ">" + content,
         },
       },
     ];
@@ -39,7 +39,6 @@ export class SpotlightService {
         alt_text: "",
       });
     }
-    console.log(blocks);
 
     return blocks;
   };

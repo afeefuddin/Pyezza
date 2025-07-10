@@ -108,22 +108,15 @@ export const sendMessageTask = task({
           return;
         }
 
-        const alreadySent = await tx.messageTemplate.findMany({
+        const template = await tx.messageTemplate.findFirst({
           where: {
             Message: {
-              some: {
+              none: {
                 channelId: channel.id,
               },
             },
-          },
-          select: { id: true },
-        });
-
-        const template = await tx.messageTemplate.findFirst({
-          where: {
-            id: { notIn: alreadySent.map((m) => m.id) },
             type: channel.type as TMessageTemplate["type"],
-            active: true, // Add an active field to MessageTemplate if not exists
+            active: true,
           },
         });
 
@@ -296,18 +289,23 @@ export const sendReminder = task({
         return;
       }
 
-      let reminder = await prisma.reminder.findFirst({
-        where: {
-          messageId: payload.id,
-        },
-      });
-      if (!reminder) {
-        reminder = await prisma.reminder.create({
-          data: {
+      const reminder = await prisma.$transaction(async (tx) => {
+        let existingReminder = await tx.reminder.findFirst({
+          where: {
             messageId: payload.id,
           },
         });
-      }
+
+        if (!existingReminder) {
+          existingReminder = await tx.reminder.create({
+            data: {
+              messageId: payload.id,
+            },
+          });
+        }
+
+        return existingReminder;
+      });
 
       await sendSlackReminder.trigger({
         reminderId: reminder.id,
@@ -391,7 +389,7 @@ export const firstScheduledTask = schedules.task({
                 select: {
                   reminderMessage: true,
                   reminderInterval: true,
-                  reminderOn: true
+                  reminderOn: true,
                 },
               },
             },

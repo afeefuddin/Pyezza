@@ -10,12 +10,26 @@ const updateSettingApiSchema = z.object({
   daysOfTheWeek: z.array(z.number()).optional(),
   timeOfTheDay: z.number().optional(),
   timezone: z.string(),
+  reminderOn: z.boolean().optional(),
+  reminderInterval: z.number().optional(),
 });
 
 type Params = {
   integrationId: string;
   channelId: string;
 };
+
+function timeBounded(value: number) {
+  if (value <= 0) {
+    return 0;
+  }
+
+  if (value >= 86399) {
+    return 86399;
+  }
+
+  return value;
+}
 
 export const PUT = withError(
   withUser(async (req, params) => {
@@ -59,7 +73,12 @@ export const PUT = withError(
     }
 
     if (data.timeOfTheDay) {
-      updateData["timeOfday"] = data.timeOfTheDay;
+      updateData["timeOfday"] = timeBounded(data.timeOfTheDay);
+    }
+
+    if (data.reminderOn && channel.type === "spotlight") {
+      updateData["reminderOn"] = data.reminderOn;
+      updateData["reminderInterval"] = timeBounded(data.reminderInterval);
     }
 
     await prisma.channelSetting.update({

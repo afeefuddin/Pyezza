@@ -1,9 +1,9 @@
 "use server";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, User } from "@clerk/nextjs/server";
 import { prisma, testPrisma } from "@repo/database";
 
 export async function getUser() {
-  let clerkUser;
+  let clerkUser: User | undefined;
   try {
     clerkUser = await currentUser();
   } catch (error) {
@@ -15,18 +15,21 @@ export async function getUser() {
 
   testPrisma();
   try {
-    const data = prisma.user.upsert({
+    let data = await prisma.user.findFirst({
       where: {
         externalProviderId: clerkUser.id,
       },
-      update: {},
-      create: {
-        email: clerkUser.emailAddresses[0].emailAddress,
-        externalProviderId: clerkUser.id,
-        imageUrl: clerkUser.imageUrl,
-        name: clerkUser.fullName,
-      },
     });
+    if (!data) {
+      data = await prisma.user.create({
+        data: {
+          email: clerkUser.emailAddresses[0].emailAddress,
+          externalProviderId: clerkUser.id,
+          imageUrl: clerkUser.imageUrl,
+          name: clerkUser.fullName,
+        },
+      });
+    }
 
     return data;
   } catch (error) {

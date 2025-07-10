@@ -4,7 +4,7 @@ import { TimezoneComboBox } from "@/components/Timezonecombobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { TChannelSetting } from "@repo/types/channelSetting";
-import { Calendar, Clock, Earth, LoaderCircle } from "lucide-react";
+import { Bell, Calendar, Clock, Earth, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -15,6 +15,7 @@ import axios from "axios";
 import { dateToSeconds, secondToDate } from "@repo/lib/date";
 import { useRouter } from "next/navigation";
 import revalidatePathAction from "@/actions/revalidate";
+import { Switch } from "@/components/ui/switch";
 
 export default function Settings({
   data,
@@ -33,9 +34,13 @@ export default function Settings({
   const [timeOfTheDay, setTimeOfTheDay] = useState<Date | undefined>(
     data.timeOfday ? secondToDate(data.timeOfday) : undefined
   );
+  const [reminderInterval, setReminderInterval] = useState<Date | undefined>(
+    data.reminderInterval ? secondToDate(data.reminderInterval) : undefined
+  );
   const [timezone, setTimezone] = useState<string>(
     data.timezone ?? "Etc/GMT+0"
   );
+  const [reminderOn, setReminderOn] = useState(data.reminderOn ?? false);
   const router = useRouter();
 
   const { mutate: submit, isPending } = useMutation({
@@ -45,6 +50,8 @@ export default function Settings({
         daysOfTheWeek,
         timeOfTheDay: dateToSeconds(timeOfTheDay),
         timezone,
+        reminderInterval: dateToSeconds(reminderInterval),
+        reminderOn,
       };
       await axios.put(
         `/api/integrations/${integrationId}/c/${data.channel.publicId}`,
@@ -121,6 +128,39 @@ export default function Settings({
             </div>
             <TimezoneComboBox value={timezone} onChange={setTimezone} />
           </div>
+          {data.channel.type === "spotlight" && (
+            <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+              <div className=" grid grid-cols-4 col-span-4">
+                <Bell size={30} className="text-muted-foreground" />
+                <div className="col-span-3 text-start">
+                  <div>Enable Reminders</div>
+                  <div className="text-gray-800 text-sm"></div>
+                </div>
+              </div>
+              <Switch
+                checked={reminderOn}
+                onCheckedChange={(value) => setReminderOn(value)}
+              />
+            </div>
+          )}
+          {reminderOn && (
+            <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+              <div className=" grid grid-cols-4 col-span-4">
+                <Clock size={30} className="text-muted-foreground" />
+                <div className="col-span-3">
+                  <div>Reminder Interval</div>
+                  <div className="text-gray-800 text-sm">
+                    After how much time should pyezza remind them?
+                  </div>
+                </div>
+              </div>
+              <TimeOfDay
+                date={reminderInterval}
+                setDate={setReminderInterval}
+              />
+            </div>
+          )}
+
           <div className="flex justify-end gap-4">
             <Link href={`/integrations/${integrationId}`}>
               <Button variant="link">Cancel</Button>

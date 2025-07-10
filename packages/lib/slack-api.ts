@@ -32,6 +32,7 @@ export class SlackApi {
 
   constructor(token: string) {
     this.token = decrypt(token);
+    console.log(this.token);
     this.headers = {
       Authorization: `Bearer ${this.token}`,
     };
@@ -89,13 +90,12 @@ export class SlackApi {
   async sendMessage(blocks: unknown[], channelId: string, ts?: string | null) {
     const searchParams = new URLSearchParams({
       channel: channelId,
-      blocks: encodeURIComponent(JSON.stringify(blocks)),
+      blocks: JSON.stringify(blocks),
     });
 
     if (ts) {
       searchParams.append("thread_ts", ts);
     }
-
     const response = await axios.post(
       `${this.url}/chat.postMessage?${searchParams.toString()}`,
       null,
@@ -146,6 +146,7 @@ export class SlackApi {
   }
 
   async getMessageHistory(channelId: string, oldest: string) {
+    console.log("The oldest time I ask for is:", oldest);
     const response = await axios.get(
       `${this.url}/conversations.history?channel=${channelId}&oldest=${oldest}`,
       {
@@ -159,7 +160,10 @@ export class SlackApi {
           ok: z.literal(true),
           messages: z.array(
             z.object({
+              type: z.string(),
               user: z.string().optional(),
+              text: z.string().optional(),
+              ts: z.string().optional(),
             })
           ),
         }),

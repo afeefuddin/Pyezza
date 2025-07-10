@@ -12,8 +12,18 @@ import {
   sendReminderMessage,
   sendSpotLightMessage,
 } from "../sendMessage";
-import { dateToSeconds } from "@repo/lib/date";
 import assert from "minimalistic-assert";
+
+const updateReminderEligiblity = async (messageId: number) => {
+  await prisma.message.update({
+    where: {
+      id: messageId,
+    },
+    data: {
+      eligibleForReminder: false,
+    },
+  });
+};
 
 export const sendSlackMessage = task({
   id: "send-message-slack",
@@ -207,14 +217,7 @@ export const sendSlackReminder = task({
         },
       });
 
-      await prisma.message.update({
-        where: {
-          id: reminder.message.id,
-        },
-        data: {
-          eligibleForReminder: false,
-        },
-      });
+      await updateReminderEligiblity(reminder.message.id);
     }
   },
 });
@@ -254,7 +257,7 @@ export const sendReminder = task({
       assert(message.sent_ts, "Sent timestamp is required");
 
       const slackApi = new SlackApi(message.channel.integration.token);
-      const oldest = dateToSeconds(new Date(message.createdAt)).toString();
+      const oldest = message.sent_ts;
       const history = await slackApi.getMessageHistory(
         message.channel.channelId,
         oldest
@@ -266,6 +269,8 @@ export const sendReminder = task({
       );
 
       if (found) {
+        console.log("found in history");
+        await updateReminderEligiblity(payload.id);
         logger.info(
           `Found tagged member reply in history for message ${payload.id}`
         );
@@ -284,6 +289,7 @@ export const sendReminder = task({
       );
 
       if (found) {
+        await updateReminderEligiblity(payload.id);
         logger.info(
           `Found tagged member reply in history for message ${payload.id}`
         );
@@ -316,7 +322,7 @@ export const firstScheduledTask = schedules.task({
   id: "first-scheduled-task",
   cron: "*/15 * * * *",
   maxDuration: 300,
-  run: async (payload, { ctx }) => {
+  run: async () => {
     try {
       const channels = await prisma.channel.findMany({
         where: {
@@ -390,6 +396,13 @@ export const firstScheduledTask = schedules.task({
       });
 
       const reminderToProcess = filterReminderMessages(reminderMessages);
+      await Promise.all(
+        reminderToProcess.map((reminder) =>
+          sendReminder
+            .trigger({ id: reminder.id })
+            .catch((error) => logger.error(error))
+        )
+      );
     } catch (error: any) {
       logger.error("Error in messageScheduler:", error);
       throw error;

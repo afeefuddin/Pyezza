@@ -1,9 +1,9 @@
 "use server";
-import { currentUser } from "@clerk/nextjs/server";
-import { prisma, testPrisma } from "@repo/database";
+import { currentUser, User } from "@clerk/nextjs/server";
+import { prisma } from "@repo/database";
 
 export async function getUser() {
-  let clerkUser;
+  let clerkUser: User | undefined;
   try {
     clerkUser = await currentUser();
   } catch (error) {
@@ -13,19 +13,26 @@ export async function getUser() {
     return null;
   }
 
-  testPrisma();
   try {
-    const data = prisma.user.upsert({
-      where: {
-        externalProviderId: clerkUser.id,
-      },
-      update: {},
-      create: {
-        email: clerkUser.emailAddresses[0].emailAddress,
-        externalProviderId: clerkUser.id,
-        imageUrl: clerkUser.imageUrl,
-        name: clerkUser.fullName,
-      },
+    const data = await prisma.$transaction(async (tx) => {
+      let existingUser = await tx.user.findFirst({
+        where: {
+          externalProviderId: clerkUser.id,
+        },
+      });
+
+      if (!existingUser) {
+        existingUser = await tx.user.create({
+          data: {
+            email: clerkUser.emailAddresses[0]?.emailAddress,
+            externalProviderId: clerkUser.id,
+            imageUrl: clerkUser.imageUrl,
+            name: clerkUser.fullName,
+          },
+        });
+      }
+
+      return existingUser;
     });
 
     return data;

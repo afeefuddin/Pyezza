@@ -1,182 +1,28 @@
 import { prisma } from "@repo/database";
-import { SpotlightService } from "@repo/services/spotlight.service";
 import { logger, schedules, task, wait } from "@trigger.dev/sdk/v3";
-import {
-  TChannel,
-  TChannelWithIntegration,
-  TChannelWithSettingAndMessage,
-} from "@repo/types/channel";
-import { TMessage } from "@repo/types/message";
 import { TMessageTemplate } from "@repo/types/messageTemplate";
-import { dateToSeconds } from "@repo/lib/date";
 import { SlackApi } from "@repo/lib/slack-api";
-function filterChannels(
-  channels: TChannelWithSettingAndMessage[]
-): TChannelWithSettingAndMessage[] {
-  const filterChannels: TChannelWithSettingAndMessage[] = [];
+import {
+  filterChannels,
+  filterReminderMessages,
+  findTaggedMemberReplyInHistory,
+} from "../utils";
+import {
+  sendGenericSocialMessage,
+  sendReminderMessage,
+  sendSpotLightMessage,
+} from "../sendMessage";
+import assert from "minimalistic-assert";
 
-  channels.forEach((channel) => {
-    if (!channel.setting) {
-      console.log("Disappointing");
-      return;
-    }
-    const timezone = channel.setting.timezone;
-    const date = new Date(
-      new Date().toLocaleString("en-US", { timeZone: timezone })
-    );
-
-    let today = date.getDay() - 1;
-    if (today < 0) {
-      today = 6;
-    }
-
-    // If Eligible to send message today
-    if (!channel.setting.daysOfWeek.includes(today)) {
-      console.log("Did not match the date");
-      return;
-    }
-
-    // If last message sent was today
-    if (channel.Message[0]) {
-      const lastMessageDateLocal = new Date(
-        channel.Message[0].createdAt.toLocaleString("en-US", {
-          timeZone: timezone,
-        })
-      );
-      const dupDate = new Date(date);
-      if (
-        lastMessageDateLocal.setHours(0, 0, 0, 0) ===
-        dupDate.setHours(0, 0, 0, 0)
-      ) {
-        return;
-      }
-    }
-
-    // if it's the right time to send the message
-    const startTime = channel.setting.timeOfday - 10 * 60;
-    const endTime = channel.setting.timeOfday + 15 * 60;
-    const currentTime = dateToSeconds(date);
-    if (currentTime < startTime || currentTime > endTime) {
-      console.log(
-        "Did not match the time",
-        date,
-        currentTime,
-        startTime,
-        endTime,
-        channel.channelName
-      );
-      return;
-    }
-
-    filterChannels.push(channel);
+const updateReminderEligiblity = async (messageId: number) => {
+  await prisma.message.update({
+    where: {
+      id: messageId,
+    },
+    data: {
+      eligibleForReminder: false,
+    },
   });
-
-  return filterChannels;
-}
-
-const sendSpotLightMessage = async (
-  message: TMessage & {
-    channel: TChannelWithIntegration;
-    template: TMessageTemplate;
-  },
-  slackApi: SlackApi
-) => {
-  const spotlight = new SpotlightService(
-    message.channel.id,
-    message.channel.channelId!,
-    slackApi,
-    message.channel.integration.botUserId!
-  );
-
-  const userToTag = await spotlight.popNextUser();
-  const messageToSend = await spotlight.buildSlackMessage(
-    message.template,
-    userToTag
-  );
-
-  const result = await slackApi.sendMessage(
-    messageToSend,
-    message.channel.channelId!
-  );
-
-  if (!result.ok) {
-    throw new Error(
-      `Error sending spotlight message: ${result.error}, channel: ${message.channel.channelId}`
-    );
-  }
-};
-
-const sendGenericSocialMessage = async (
-  message: TMessage & {
-    channel: TChannelWithIntegration;
-    template: TMessageTemplate;
-  },
-  slackApi: SlackApi
-) => {
-  if (!message.channel.channelId) {
-    throw new Error("Channel not assigned");
-  }
-
-  let messageToSend: Record<string, unknown>[];
-
-  if (message.template.type === "socialsips") {
-    messageToSend = [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "🥤 *Time for a social sip* 🥤",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: ">" + message.template.content,
-        },
-      },
-    ];
-  } else {
-    messageToSend = [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*Would you rather* 🤔",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: ">" + message.template.content,
-        },
-      },
-    ];
-  }
-
-  if (message.template.gif) {
-    messageToSend.push({
-      type: "image",
-      block_id: "image4",
-      image_url: message.template.gif,
-      alt_text: "",
-    });
-  }
-
-  const messageSlack = await slackApi.sendMessage(
-    messageToSend,
-    message.channel.channelId
-  );
-
-  if (!messageSlack.ok) {
-    const errorMessage =
-      "Error message seding failed: " +
-      messageSlack.error +
-      " id: " +
-      message.channel!.channelId;
-    throw new Error(errorMessage);
-  }
 };
 
 export const sendSlackMessage = task({
@@ -214,11 +60,18 @@ export const sendSlackMessage = task({
     }
 
     const slackApi = new SlackApi(channel.integration.token);
+    let taggedMembers: string[] = [];
+    let result: {
+      ok: true;
+      ts: string;
+    } | null = null;
 
     if (message.template.type === "spotlight") {
-      await sendSpotLightMessage(message, slackApi);
+      const response = await sendSpotLightMessage(message, slackApi);
+      taggedMembers = response.taggedMembers;
+      result = response.result;
     } else {
-      await sendGenericSocialMessage(message, slackApi);
+      result = await sendGenericSocialMessage(message, slackApi);
     }
 
     try {
@@ -228,10 +81,12 @@ export const sendSlackMessage = task({
         },
         data: {
           status: "SENT",
+          taggedMembers,
+          sent_ts: result.ts,
         },
       });
     } catch (error) {
-      logger.warn("ERROR Updating the message");
+      logger.warn("ERROR: Updating or Sending the message");
     }
   },
 });
@@ -253,22 +108,15 @@ export const sendMessageTask = task({
           return;
         }
 
-        const alreadySent = await tx.messageTemplate.findMany({
+        const template = await tx.messageTemplate.findFirst({
           where: {
             Message: {
-              some: {
+              none: {
                 channelId: channel.id,
               },
             },
-          },
-          select: { id: true },
-        });
-
-        const template = await tx.messageTemplate.findFirst({
-          where: {
-            id: { notIn: alreadySent.map((m) => m.id) },
             type: channel.type as TMessageTemplate["type"],
-            active: true, // Add an active field to MessageTemplate if not exists
+            active: true,
           },
         });
 
@@ -297,11 +145,182 @@ export const sendMessageTask = task({
   },
 });
 
+export const sendSlackReminder = task({
+  id: "send-reminder-slack",
+  run: async (payload: { reminderId: number }) => {
+    const reminder = await prisma.reminder.findUnique({
+      where: {
+        id: payload.reminderId,
+      },
+      select: {
+        message: {
+          select: {
+            id: true,
+            channel: {
+              select: {
+                channelId: true,
+                integration: {
+                  select: {
+                    token: true,
+                  },
+                },
+              },
+            },
+            sent_ts: true,
+            taggedMembers: true,
+          },
+        },
+      },
+    });
+
+    if (!reminder) {
+      logger.error(`Reminder ${payload.reminderId} not found`);
+      return;
+    }
+
+    if (!reminder.message.channel.integration.token) {
+      logger.error(
+        `Integration token not found for reminder ${payload.reminderId}`
+      );
+      return;
+    }
+    if (!reminder.message.channel.channelId) {
+      logger.error(`Channel ID not found for reminder ${payload.reminderId}`);
+      return;
+    }
+
+    const slackApi = new SlackApi(reminder.message.channel.integration.token);
+    const data = await sendReminderMessage(
+      {
+        userId: reminder.message.taggedMembers[0],
+        channelId: reminder.message.channel.channelId,
+        ts: reminder.message.sent_ts,
+      },
+      slackApi
+    );
+
+    if (data.ok) {
+      await prisma.reminder.update({
+        where: {
+          id: payload.reminderId,
+        },
+        data: {
+          status: "SENT",
+          sent_ts: data.ts,
+        },
+      });
+
+      await updateReminderEligiblity(reminder.message.id);
+    }
+  },
+});
+
+export const sendReminder = task({
+  id: "send-reminder",
+  run: async (payload: { id: number }) => {
+    try {
+      const message = await prisma.message.findUnique({
+        where: {
+          id: payload.id,
+        },
+        select: {
+          sent_ts: true,
+          createdAt: true,
+          taggedMembers: true,
+          channel: {
+            select: {
+              integration: {
+                select: {
+                  token: true,
+                },
+              },
+              channelId: true,
+            },
+          },
+        },
+      });
+
+      if (!message) {
+        logger.error(`Message ${payload.id} not found`);
+        return;
+      }
+
+      assert(message.channel.integration.token);
+      assert(message.channel.channelId);
+      assert(message.sent_ts, "Sent timestamp is required");
+
+      const slackApi = new SlackApi(message.channel.integration.token);
+      const oldest = message.sent_ts;
+      const history = await slackApi.getMessageHistory(
+        message.channel.channelId,
+        oldest
+      );
+
+      let found = findTaggedMemberReplyInHistory(
+        message.taggedMembers,
+        history.messages
+      );
+
+      if (found) {
+        console.log("found in history");
+        await updateReminderEligiblity(payload.id);
+        logger.info(
+          `Found tagged member reply in history for message ${payload.id}`
+        );
+        return;
+      }
+
+      const replies = await slackApi.getReplies(
+        message.channel.channelId!,
+        message.sent_ts,
+        oldest
+      );
+
+      found = findTaggedMemberReplyInHistory(
+        message.taggedMembers,
+        replies.messages
+      );
+
+      if (found) {
+        await updateReminderEligiblity(payload.id);
+        logger.info(
+          `Found tagged member reply in history for message ${payload.id}`
+        );
+        return;
+      }
+
+      const reminder = await prisma.$transaction(async (tx) => {
+        let existingReminder = await tx.reminder.findFirst({
+          where: {
+            messageId: payload.id,
+          },
+        });
+
+        if (!existingReminder) {
+          existingReminder = await tx.reminder.create({
+            data: {
+              messageId: payload.id,
+            },
+          });
+        }
+
+        return existingReminder;
+      });
+
+      await sendSlackReminder.trigger({
+        reminderId: reminder.id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+});
+
 export const firstScheduledTask = schedules.task({
   id: "first-scheduled-task",
   cron: "*/15 * * * *",
   maxDuration: 300,
-  run: async (payload, { ctx }) => {
+  run: async () => {
     try {
       const channels = await prisma.channel.findMany({
         where: {
@@ -318,7 +337,6 @@ export const firstScheduledTask = schedules.task({
         },
       });
       const channelsToProcess = filterChannels(channels);
-      console.log(channelsToProcess);
       await Promise.all(
         channelsToProcess.map((channel) =>
           sendMessageTask
@@ -326,6 +344,65 @@ export const firstScheduledTask = schedules.task({
             .catch((error) =>
               logger.error(`Failed to process channel ${channel.id}:`, error)
             )
+        )
+      );
+
+      const reminderMessages = await prisma.message.findMany({
+        where: {
+          AND: [
+            {
+              status: "SENT",
+            },
+            {
+              Reminder: {
+                none: {},
+              },
+            },
+            {
+              channel: {
+                type: "spotlight",
+                setting: {
+                  reminderOn: true,
+                },
+              },
+            },
+            {
+              createdAt: {
+                gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+              },
+            },
+            {
+              eligibleForReminder: true,
+            },
+          ],
+        },
+        include: {
+          channel: {
+            select: {
+              channelId: true,
+              integration: {
+                select: {
+                  token: true,
+                },
+              },
+              setting: {
+                select: {
+                  reminderMessage: true,
+                  reminderInterval: true,
+                  reminderOn: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const reminderToProcess = filterReminderMessages(reminderMessages);
+      await Promise.all(
+        reminderToProcess.map((reminder) =>
+          sendReminder
+            .trigger({ id: reminder.id })
+            .catch((error) => logger.error(error))
         )
       );
     } catch (error: any) {

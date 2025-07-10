@@ -73,13 +73,16 @@ model Integration {
 }
 
 model ChannelSetting {
-  id         Int     @id @default(autoincrement())
-  timezone   String  @default("Asia/Kolkata")
-  timeOfday  Int     @default(36000)
-  channel    Channel @relation(fields: [channelId], references: [id])
-  channelId  Int     @unique
-  everyNWeek Int     @default(1)
-  daysOfWeek Int[]   @default([0, 2, 4])
+  id               Int     @id @default(autoincrement())
+  timezone         String  @default("Asia/Kolkata")
+  timeOfday        Int     @default(36000)
+  channel          Channel @relation(fields: [channelId], references: [id])
+  channelId        Int     @unique
+  everyNWeek       Int     @default(1)
+  daysOfWeek       Int[]   @default([0, 2, 4])
+  reminderOn       Boolean @default(false)
+  reminderMessage  String?
+  reminderInterval Int     @default(28800)
 }
 
 model Channel {
@@ -110,14 +113,18 @@ model MessageTemplate {
 }
 
 model Message {
-  id                Int             @id @default(autoincrement())
-  channelId         Int
-  channel           Channel         @relation(fields: [channelId], references: [id])
-  template          MessageTemplate @relation(fields: [messageTemplateId], references: [id])
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  messageTemplateId Int
-  status            MessageStatus   @default(PENDING)
+  id                  Int             @id @default(autoincrement())
+  channelId           Int
+  channel             Channel         @relation(fields: [channelId], references: [id])
+  template            MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  messageTemplateId   Int
+  status              MessageStatus   @default(PENDING)
+  sent_ts             String? // Provided by the integration
+  taggedMembers       String[]        @default([])
+  Reminder            Reminder[]
+  eligibleForReminder Boolean         @default(true)
 }
 
 model SpotlightMessageQueue {
@@ -127,4 +134,15 @@ model SpotlightMessageQueue {
   members   String[]
 
   @@unique([channelId])
+}
+
+model Reminder {
+  id            Int           @id @default(autoincrement())
+  messageId     Int
+  message       Message       @relation(fields: [messageId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  status        MessageStatus @default(PENDING)
+  taggedMembers String[]      @default([])
+  sent_ts       String?
 }

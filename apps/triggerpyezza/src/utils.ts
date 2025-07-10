@@ -73,6 +73,10 @@ export function filterReminderMessages(
       return false;
     }
 
+    if (!message.channel.setting.reminderOn) {
+      return false;
+    }
+
     const reminderTime =
       dateToSeconds(new Date(message.createdAt)) +
       message.channel.setting.reminderInterval;

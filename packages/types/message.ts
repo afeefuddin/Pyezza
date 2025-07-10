@@ -8,6 +8,7 @@ export type TMessageWithChannelIdAndReminderSettings = TMessage & {
     setting: {
       reminderMessage: string | null;
       reminderInterval: number;
+      reminderOn?: boolean
     } | null;
     integration: {
       token: string | null;

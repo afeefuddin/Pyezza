@@ -32,7 +32,6 @@ export class SlackApi {
 
   constructor(token: string) {
     this.token = decrypt(token);
-    console.log(this.token);
     this.headers = {
       Authorization: `Bearer ${this.token}`,
     };
@@ -146,7 +145,6 @@ export class SlackApi {
   }
 
   async getMessageHistory(channelId: string, oldest: string) {
-    console.log("The oldest time I ask for is:", oldest);
     const response = await axios.get(
       `${this.url}/conversations.history?channel=${channelId}&oldest=${oldest}`,
       {

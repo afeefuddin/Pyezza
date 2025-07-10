@@ -363,6 +363,9 @@ export const firstScheduledTask = schedules.task({
             {
               channel: {
                 type: "spotlight",
+                setting: {
+                  reminderOn: true,
+                },
               },
             },
             {
@@ -388,6 +391,7 @@ export const firstScheduledTask = schedules.task({
                 select: {
                   reminderMessage: true,
                   reminderInterval: true,
+                  reminderOn: true
                 },
               },
             },

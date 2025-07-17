@@ -78,12 +78,13 @@ export function filterReminderMessages(
     }
 
     const reminderTime =
-      dateToSeconds(new Date(message.createdAt)) +
-      message.channel.setting.reminderInterval;
+      new Date(message.createdAt).getTime() +
+      message.channel.setting.reminderInterval * 1000;
 
     const currentTime = Date.now();
+    const tenMinutesInMs = 10 * 60 * 1000;
 
-    if (reminderTime > currentTime + 10 * 60 * 60) {
+    if (reminderTime > currentTime + tenMinutesInMs) {
       return false;
     }
 

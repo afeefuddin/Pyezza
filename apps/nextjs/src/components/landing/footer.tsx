@@ -24,7 +24,13 @@ export default function Footer() {
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0" id="el-9o1gbnpu">
             <span className="text-gray-400 hover:text-orange-500 transition-colors">
+              <Link href="https://github.com/afeefuddin/pyezza" target="_blank">Github</Link>
+            </span>
+            <span className="text-gray-400 hover:text-orange-500 transition-colors">
               <Link href="/privacy">Privacy Policy</Link>
+            </span>
+            <span className="text-gray-400 hover:text-orange-500 transition-colors">
+              <Link href="/terms">Terms of service</Link>
             </span>
           </div>
         </div>

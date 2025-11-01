@@ -26,6 +26,7 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tooltip": "^1.1.7",
     "@repo/database": "*",
+    "@repo/trigger": "*",
     "@tabler/icons-react": "^3.29.0",
     "@tanstack/react-query": "^5.64.2",
     "axios": "^1.7.9",

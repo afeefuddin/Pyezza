@@ -4,7 +4,14 @@ import { TimezoneComboBox } from "@/components/Timezonecombobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { TChannelSetting } from "@repo/types/channelSetting";
-import { Bell, Calendar, Clock, Earth, LoaderCircle } from "lucide-react";
+import {
+  Bell,
+  Calendar,
+  Clock,
+  Earth,
+  Forward,
+  LoaderCircle,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -41,6 +48,9 @@ export default function Settings({
     data.timezone ?? "Etc/GMT+0"
   );
   const [reminderOn, setReminderOn] = useState(data.reminderOn ?? false);
+  const [forwardResponseFromThread, setForwardResponseFromThread] = useState(
+    data.forwardResponseFromThread ?? false
+  );
   const router = useRouter();
 
   const { mutate: submit, isPending } = useMutation({
@@ -52,6 +62,7 @@ export default function Settings({
         timezone,
         reminderInterval: dateToSeconds(reminderInterval),
         reminderOn,
+        forwardResponseFromThread
       };
       await axios.put(
         `/api/integrations/${integrationId}/c/${data.channel.publicId}`,
@@ -129,19 +140,36 @@ export default function Settings({
             <TimezoneComboBox value={timezone} onChange={setTimezone} />
           </div>
           {data.channel.type === "spotlight" && (
-            <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
-              <div className=" grid grid-cols-4 col-span-4">
-                <Bell size={30} className="text-muted-foreground" />
-                <div className="col-span-3 text-start">
-                  <div>Enable Reminders</div>
-                  <div className="text-gray-800 text-sm"></div>
+            <>
+              <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+                <div className=" grid grid-cols-4 col-span-4">
+                  <Bell size={30} className="text-muted-foreground" />
+                  <div className="col-span-3 text-start">
+                    <div>Enable Reminders</div>
+                    <div className="text-gray-800 text-sm"></div>
+                  </div>
                 </div>
+                <Switch
+                  checked={reminderOn}
+                  onCheckedChange={(value) => setReminderOn(value)}
+                />
               </div>
-              <Switch
-                checked={reminderOn}
-                onCheckedChange={(value) => setReminderOn(value)}
-              />
-            </div>
+              <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">
+                <div className=" grid grid-cols-4 col-span-4">
+                  <Forward size={30} className="text-muted-foreground" />
+                  <div className="col-span-3 text-start">
+                    <div>Forward Thread Replies to Channel</div>
+                    <div className="text-gray-800 text-sm"></div>
+                  </div>
+                </div>
+                <Switch
+                  checked={forwardResponseFromThread}
+                  onCheckedChange={(value) =>
+                    setForwardResponseFromThread(value)
+                  }
+                />
+              </div>
+            </>
           )}
           {reminderOn && (
             <div className="flex flex-col items-start gap-4 lg:gap-0 lg:grid lg:grid-cols-8 lg:items-center">

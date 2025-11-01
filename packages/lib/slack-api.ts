@@ -1,6 +1,7 @@
 import axios from "axios";
 import { z } from "zod";
 import { decrypt } from "./encrypt";
+import { WebClient } from "@slack/web-api";
 
 export const slackChannelsResponseSchema = z.object({
   channels: z.array(
@@ -210,5 +211,9 @@ export class SlackApi {
     }
 
     return parsedData;
+  }
+
+  slackClient() {
+    return new WebClient(this.token);
   }
 }

@@ -3,7 +3,7 @@ import * as crypto from "node:crypto";
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY!;
 const IV_LENGTH = 16;
 const ALGORITHM = "aes-256-cbc";
-const KEY = Buffer.from(ENCRYPTION_KEY, "hex"); // ✅ decoded ONCE and reused
+const KEY = Buffer.from(ENCRYPTION_KEY, "hex"); 
 
 export function encrypt(text: string): string {
   const iv = crypto.randomBytes(IV_LENGTH);

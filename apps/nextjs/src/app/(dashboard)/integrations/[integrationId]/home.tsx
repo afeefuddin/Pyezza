@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { TIntegrationWithChannels } from "@repo/types/integration";
-import { Plus, Settings } from "lucide-react";
+import { MessageSquareMore, Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import NotificationBanner from "./components/notification-banner";
@@ -20,30 +20,29 @@ function ChannelCard({
   messageSent: number;
 }) {
   return (
-    <Card className="group relative p-6 flex flex-col gap-4 rounded-lg transition-all hover:cursor-pointer hover:shadow-lg">
-      <Link href={`/integrations/${integrationId}/c/${publicId}`} prefetch>
-        <div className="absolute inset-0 bg-gradient-to-r rounded-lg from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-        <div className="flex flex-row justify-between shrink gap-4">
-          <div className="text-2xl  truncate font-bold shrink">
-            #{channelName}
-          </div>
-          <Settings size={20} />
-        </div>
-        <div className="flex justify-between">
-          <div className="flex flex-col gap-1">
-            <div className="capitalize text-lg">{type}</div>
-            <div className="text-gray-700">Messages Sent: {messageSent}</div>
-          </div>
+    <Link href={`/integrations/${integrationId}/c/${publicId}`} prefetch>
+      <Card className="p-4 hover:cursor-pointer">
+        <div>
           {type === "spotlight" ? (
-            <Image src="/spotlight.svg" alt="" height={100} width={100} />
+            <Image src="/spotlight.svg" alt="" height={400} width={400} />
           ) : type === "socialsips" ? (
-            <Image src="/socialsips.png" alt="" height={130} width={130} />
+            <Image src="/socialsips.png" alt="" height={400} width={400} />
           ) : (
-            <Image src="/wouldyourather.png" alt="" height={130} width={130} />
+            <Image src="/wouldyourather.png" alt="" height={400} width={400} />
           )}
+          <div className="flex flex-row justify-between items-center">
+            <div>
+              <div className="font-bold text-xl">#{channelName}</div>
+              <div className="capitalize text-gray-700">{type}</div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <MessageSquareMore className="text-gray-700" />
+              <div className="text-gray-700">{messageSent}</div>
+            </div>
+          </div>
         </div>
-      </Link>
-    </Card>
+      </Card>
+    </Link>
   );
 }
 
@@ -68,7 +67,7 @@ export default function Home({
       {newChannel === "success" && <NotificationBanner />}
       <div>
         {data.channels.length > 0 ? (
-          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4">
+          <div className="flex flex-col lg:grid lg:grid-cols-4 gap-4">
             {data.channels.map((c) => (
               <ChannelCard
                 channelName={c.channelName ?? ""}

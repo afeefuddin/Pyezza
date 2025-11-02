@@ -22,13 +22,25 @@ function ChannelCard({
   return (
     <Link href={`/integrations/${integrationId}/c/${publicId}`} prefetch>
       <Card className="p-4 hover:cursor-pointer">
-        <div>
+        <div className="flex flex-col gap-4">
           {type === "spotlight" ? (
-            <Image src="/spotlight.svg" alt="" height={400} width={400} />
+            <Image
+              src="/spotlight-message.png"
+              alt=""
+              height={400}
+              width={400}
+              className="rounded-lg"
+            />
           ) : type === "socialsips" ? (
-            <Image src="/socialsips.png" alt="" height={400} width={400} />
+            <Image
+              src="/socialsips-message.png"
+              alt=""
+              height={400}
+              width={400}
+              className="rounded-lg"
+            />
           ) : (
-            <Image src="/wouldyourather.png" alt="" height={400} width={400} />
+            <Image src="/wouldyourather-message.png" alt="" height={400} width={400} />
           )}
           <div className="flex flex-row justify-between items-center">
             <div>
@@ -40,6 +52,7 @@ function ChannelCard({
               <div className="text-gray-700">{messageSent}</div>
             </div>
           </div>
+          <Button>Configure</Button>
         </div>
       </Card>
     </Link>

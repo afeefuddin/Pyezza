@@ -12,6 +12,7 @@ const updateSettingApiSchema = z.object({
   timezone: z.string(),
   reminderOn: z.boolean().optional(),
   reminderInterval: z.number().optional(),
+  forwardResponseFromThread: z.boolean().optional(),
 });
 
 type Params = {
@@ -79,6 +80,10 @@ export const PUT = withError(
     if (data.reminderOn && channel.type === "spotlight") {
       updateData["reminderOn"] = data.reminderOn;
       updateData["reminderInterval"] = timeBounded(data.reminderInterval);
+    }
+
+    if (channel.type === "spotlight") {
+      updateData["forwardResponseFromThread"] = data.forwardResponseFromThread;
     }
 
     await prisma.channelSetting.update({

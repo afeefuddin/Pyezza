@@ -5,7 +5,8 @@
   },
   "include": [
     "src/**/*",
-    "trigger.config.ts"
-, "../../packages/services/spotlight.service.ts"  ],
+    "trigger.config.ts",
+    "../../packages/services/spotlight.service.ts"
+  ],
   "exclude": ["node_modules"]
 }

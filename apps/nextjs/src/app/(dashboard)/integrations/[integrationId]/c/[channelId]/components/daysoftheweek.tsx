@@ -11,7 +11,7 @@ export function DaysOfTheWeek({
   const days = ["Mon", "Tue", "Wed", "Thurs", "Fri", "Sat", "Sun"];
 
   return (
-    <div className="grid grid-rows-2 grid-cols-4 sm:flex gap-2 w-full col-span-4">
+    <div className="grid grid-rows-2 grid-cols-4 sm:flex gap-2 md:gap-6 w-full col-span-4">
       {days.map((d, idx) => {
         const isSelected = value.includes(idx);
         return (

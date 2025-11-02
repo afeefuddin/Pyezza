@@ -98,7 +98,7 @@ export const POST = withError(async (req) => {
         messageId: message.id,
       },
       {
-        idempotencyKey: `slack-event:${body.event_id}${body.event.thread_ts}`,
+        idempotencyKey: `slack-event:${body.event.thread_ts}`,
       }
     );
   }

@@ -86,7 +86,6 @@ export const POST = withError(async (req) => {
         },
       },
     });
-    console.log(message)
     if (
       !message ||
       message.forwardedResponseFromThread ||
@@ -96,7 +95,7 @@ export const POST = withError(async (req) => {
       return NextResponse.json({ ok: true });
     }
 
-    forwardMessageToSlackChannel.trigger(
+    await forwardMessageToSlackChannel.trigger(
       {
         channelId: message.channel.id,
         message_ts: body.event.ts,

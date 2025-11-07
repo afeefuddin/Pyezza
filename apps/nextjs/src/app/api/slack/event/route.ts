@@ -45,7 +45,10 @@ export const POST = withError(async (req) => {
   const parsed = SlackEventSchema.safeParse(json);
   if (!parsed.success) {
     console.error("Invalid Slack payload", parsed.error);
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "Invalid slack payload" },
+      { status: 400 }
+    );
   }
 
   const body = parsed.data;
@@ -55,6 +58,7 @@ export const POST = withError(async (req) => {
   }
 
   const event = body.event;
+  console.log("Received Slack event:", event);
   if (event.type === "message") {
     if (!event.thread_ts) {
       return NextResponse.json({ ok: true });
@@ -82,6 +86,7 @@ export const POST = withError(async (req) => {
         },
       },
     });
+    console.log(message)
     if (
       !message ||
       message.forwardedResponseFromThread ||

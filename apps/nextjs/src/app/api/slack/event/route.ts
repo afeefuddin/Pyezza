@@ -62,7 +62,8 @@ export const POST = withError(async (req) => {
   const event = body.event;
   console.log("Received Slack event:", event);
   if (event.type === "message") {
-    if (!event.thread_ts) {
+    if (!event.thread_ts || event.subtype === "thread_broadcast") {
+      console.log("Ignoring non-reply or broadcast message");
       return NextResponse.json({ ok: true });
     }
 

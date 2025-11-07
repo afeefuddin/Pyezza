@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const MessageEventSchema = z.object({
   type: z.literal("message"),
+  subtype: z.string().optional(),
   user: z.string(),
   ts: z.string(),
   event_ts: z.string(),

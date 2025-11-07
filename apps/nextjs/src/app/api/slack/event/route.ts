@@ -42,6 +42,8 @@ export const POST = withError(async (req) => {
   }
 
   const json = JSON.parse(rawBody);
+  console.log("Slack payload:", json);
+
   const parsed = SlackEventSchema.safeParse(json);
   if (!parsed.success) {
     console.error("Invalid Slack payload", parsed.error);

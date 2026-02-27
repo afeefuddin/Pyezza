@@ -13,6 +13,7 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { usePathname } from "next/navigation";
 import { Layers } from "lucide-react";
+import useClientUser from "@/hooks/use-client-user";
 
 export default function SidebarDemo({
   children,
@@ -43,6 +44,17 @@ export default function SidebarDemo({
     },
   ];
   const { user } = useUser();
+  const currentUser = useClientUser();
+  const isAdmin = Boolean(currentUser?.isAdmin);
+  if (isAdmin) {
+    links.splice(2, 0, {
+      label: "Admin",
+      href: "/admin",
+      icon: (
+        <IconUserBolt className="group-hover:text-primary h-5 w-5 flex-shrink-0 transition-colors" />
+      ),
+    });
+  }
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   return (

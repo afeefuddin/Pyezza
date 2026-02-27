@@ -51,6 +51,7 @@ model User {
   email              String        @unique
   imageUrl           String?
   name               String?
+  isAdmin            Boolean       @default(false)
   externalProviderId String?       @unique
   integrations       Integration[]
 }

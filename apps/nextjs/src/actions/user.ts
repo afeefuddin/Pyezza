@@ -22,12 +22,15 @@ export async function getUser() {
       });
 
       if (!existingUser) {
+        const hasAnyUser = (await tx.user.count()) > 0;
         existingUser = await tx.user.create({
           data: {
             email: clerkUser.emailAddresses[0]?.emailAddress,
             externalProviderId: clerkUser.id,
             imageUrl: clerkUser.imageUrl,
             name: clerkUser.fullName,
+            // Keep local setup simple: first signed-in user becomes admin.
+            isAdmin: !hasAnyUser,
           },
         });
       }

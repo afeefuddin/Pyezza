@@ -34,6 +34,10 @@ const generateQuestionsSchema = z.object({
   topic: z.array(topicSchema).default([]),
 });
 
+const deleteMessageTemplateSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
 const aiQuestionSchema = z.object({
   content: z.string().trim().min(6),
   topic: z.array(topicSchema).optional().default([]),
@@ -337,16 +341,59 @@ export async function generateAIQuestions(formData: FormData) {
   redirect(`/admin?status=generated&count=${toInsert.length}`);
 }
 
+export async function deleteMessageTemplate(formData: FormData) {
+  const user = await getUser();
+  if (!user || !user.isAdmin) {
+    redirect("/admin?tab=questions&status=unauthorized");
+  }
+
+  const parsed = deleteMessageTemplateSchema.safeParse({
+    id: formData.get("id"),
+  });
+
+  if (!parsed.success) {
+    redirect("/admin?tab=questions&status=delete-invalid");
+  }
+
+  const linkedMessagesCount = await prisma.message.count({
+    where: { messageTemplateId: parsed.data.id },
+  });
+
+  if (linkedMessagesCount > 0) {
+    redirect("/admin?tab=questions&status=delete-blocked");
+  }
+
+  try {
+    await prisma.messageTemplate.delete({
+      where: { id: parsed.data.id },
+    });
+  } catch {
+    redirect("/admin?tab=questions&status=delete-failed");
+  }
+
+  revalidatePath("/admin");
+  redirect("/admin?tab=questions&status=deleted");
+}
+
 export async function getAdminDashboardData(filters?: {
   type?: z.infer<typeof messageTemplateTypeSchema>;
   topics?: z.infer<typeof topicSchema>[];
+  page?: number;
 }) {
   const user = await getUser();
   if (!user || !user.isAdmin) {
     return null;
   }
 
+  const pageSize = 10;
+  const currentPage = Math.max(1, filters?.page ?? 1);
+  const messageTemplateWhere = {
+    ...(filters?.type ? { type: filters.type } : {}),
+    ...(filters?.topics?.length ? { topic: { hasSome: filters.topics } } : {}),
+  };
+
   const [
+    totalMessageTemplates,
     messageTemplates,
     users,
     integrations,
@@ -356,13 +403,14 @@ export async function getAdminDashboardData(filters?: {
     reminders,
     spotlightQueue,
   ] = await Promise.all([
+    prisma.messageTemplate.count({
+      where: messageTemplateWhere,
+    }),
     prisma.messageTemplate.findMany({
-      where: {
-        ...(filters?.type ? { type: filters.type } : {}),
-        ...(filters?.topics?.length ? { topic: { hasSome: filters.topics } } : {}),
-      },
+      where: messageTemplateWhere,
       orderBy: { id: "desc" },
-      take: 100,
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         content: true,
@@ -448,8 +496,16 @@ export async function getAdminDashboardData(filters?: {
     }),
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(totalMessageTemplates / pageSize));
+
   return {
     messageTemplates,
+    pagination: {
+      page: currentPage,
+      pageSize,
+      totalItems: totalMessageTemplates,
+      totalPages,
+    },
     tablePreviews: [
       { name: "User", rows: users },
       { name: "Integration", rows: integrations },

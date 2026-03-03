@@ -1,8 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 const TOPICS = [
   "fun",
@@ -34,12 +33,18 @@ export default function QuestionFilters({
     () => new Set(selectedTopics)
   );
 
+  useEffect(() => {
+    setTypeValue(selectedType || "");
+    setTopics(new Set(selectedTopics));
+  }, [selectedType, selectedTopics]);
+
   const selectedCount = useMemo(() => topics.size, [topics]);
 
   function pushFilters(nextType: string, nextTopics: Set<Topic>) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", "questions");
-    params.set("mode", "list");
+    params.delete("mode");
+    params.delete("page");
 
     // Clear status banners when changing filters.
     params.delete("status");
@@ -79,17 +84,17 @@ export default function QuestionFilters({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-      <div className="space-y-1">
-        <p className="text-sm font-medium">Question Type</p>
-        <div className="flex flex-wrap gap-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-slate-700">Question Type</p>
+        <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
           <button
             type="button"
             onClick={() => onTypeChange("")}
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
+            className={`w-fit whitespace-nowrap rounded-xl border px-3 py-2 text-left text-sm font-medium transition ${
               !typeValue
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-muted-foreground/30 hover:bg-muted"
+                ? "border-orange-500 bg-orange-50 text-orange-700"
+                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
             }`}
             aria-pressed={!typeValue}
           >
@@ -100,10 +105,10 @@ export default function QuestionFilters({
               key={type}
               type="button"
               onClick={() => onTypeChange(typeValue === type ? "" : type)}
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
+              className={`w-fit whitespace-nowrap rounded-xl border px-3 py-2 text-left text-sm font-medium transition ${
                 typeValue === type
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-muted-foreground/30 hover:bg-muted"
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
               }`}
               aria-pressed={typeValue === type}
             >
@@ -113,11 +118,11 @@ export default function QuestionFilters({
         </div>
       </div>
 
-      <div className="space-y-1 md:col-span-2">
-        <p className="text-sm font-medium">
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-slate-700">
           Preferred Topics (quick multi-select)
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
           {TOPICS.map((topic) => {
             const active = topics.has(topic);
             return (
@@ -125,10 +130,10 @@ export default function QuestionFilters({
                 key={`filter-${topic}`}
                 type="button"
                 onClick={() => onTopicToggle(topic)}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
+                className={`w-fit whitespace-nowrap rounded-xl border px-3 py-2 text-left text-sm font-medium transition ${
                   active
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-muted-foreground/30 hover:bg-muted"
+                    ? "border-orange-500 bg-orange-50 text-orange-700"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                 }`}
                 aria-pressed={active}
               >
@@ -139,14 +144,6 @@ export default function QuestionFilters({
         </div>
       </div>
 
-      <div className="flex md:items-end">
-        <Link
-          href="/admin?tab=questions"
-          className="inline-flex h-9 items-center justify-center rounded-md border px-4 text-sm font-medium"
-        >
-          Reset {selectedCount ? `(${selectedCount})` : ""}
-        </Link>
-      </div>
     </div>
   );
 }

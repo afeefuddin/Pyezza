@@ -46,12 +46,15 @@ export default function IntegrationCard({
     onboardingCompleted: boolean;
   };
 }) {
-  const random = Math.floor(Math.random() * 10) % Backgrounds.length;
+  const backgroundIndex =
+    data.teamId
+      .split("")
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % Backgrounds.length;
   return (
     <div className="h-72 bg-muted rounded-lg">
       <div
         className="h-2/5 rounded-t-lg"
-        style={{ ...Backgrounds[random] }}
+        style={{ ...Backgrounds[backgroundIndex] }}
       ></div>
       <div className="flex grow flex-col space-y-4 px-4 py-4 sm:px-6">
         <div className="flex h-full flex-row justify-between">

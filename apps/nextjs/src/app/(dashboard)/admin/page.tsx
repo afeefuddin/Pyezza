@@ -226,6 +226,11 @@ export default async function AdminPage({
               Could not delete this question right now. It may be referenced elsewhere.
             </DismissibleStatusAlert>
           ) : null}
+          {resolvedSearchParams?.status === "delete-blocked" ? (
+            <DismissibleStatusAlert className="border-amber-200 bg-amber-50 text-amber-700">
+              This template cannot be deleted because messages already created from it exist.
+            </DismissibleStatusAlert>
+          ) : null}
 
           {selectedTab === "questions" ? (
           <div className="space-y-4">

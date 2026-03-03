@@ -355,6 +355,14 @@ export async function deleteMessageTemplate(formData: FormData) {
     redirect("/admin?tab=questions&status=delete-invalid");
   }
 
+  const linkedMessagesCount = await prisma.message.count({
+    where: { messageTemplateId: parsed.data.id },
+  });
+
+  if (linkedMessagesCount > 0) {
+    redirect("/admin?tab=questions&status=delete-blocked");
+  }
+
   try {
     await prisma.messageTemplate.delete({
       where: { id: parsed.data.id },

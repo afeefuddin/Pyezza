@@ -1,0 +1,10 @@
+   ▲ Next.js 15.1.5
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.8:3000
+
+ ✓ Starting...
+ ✓ Ready in 1360ms
+ ✓ Compiled /src/middleware in 164ms (261 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1321ms (1427 modules)
+ GET / 200 in 1819ms

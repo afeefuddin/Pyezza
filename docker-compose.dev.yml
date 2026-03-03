@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17
+    image: postgres:latest
     container_name: postgres_db
     environment:
       POSTGRES_DB: mydatabase

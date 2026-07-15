@@ -344,7 +344,7 @@ export async function generateAIQuestions(formData: FormData) {
 export async function deleteMessageTemplate(formData: FormData) {
   const user = await getUser();
   if (!user || !user.isAdmin) {
-    redirect("/admin?tab=questions&status=unauthorized");
+    redirect("/admin?status=unauthorized");
   }
 
   const parsed = deleteMessageTemplateSchema.safeParse({
@@ -352,7 +352,7 @@ export async function deleteMessageTemplate(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect("/admin?tab=questions&status=delete-invalid");
+    redirect("/admin?status=delete-invalid");
   }
 
   const linkedMessagesCount = await prisma.message.count({
@@ -360,7 +360,7 @@ export async function deleteMessageTemplate(formData: FormData) {
   });
 
   if (linkedMessagesCount > 0) {
-    redirect("/admin?tab=questions&status=delete-blocked");
+    redirect("/admin?status=delete-blocked");
   }
 
   try {
@@ -368,14 +368,14 @@ export async function deleteMessageTemplate(formData: FormData) {
       where: { id: parsed.data.id },
     });
   } catch {
-    redirect("/admin?tab=questions&status=delete-failed");
+    redirect("/admin?status=delete-failed");
   }
 
   revalidatePath("/admin");
-  redirect("/admin?tab=questions&status=deleted");
+  redirect("/admin?status=deleted");
 }
 
-export async function getAdminDashboardData(filters?: {
+export async function getAdminQuestionsData(filters?: {
   type?: z.infer<typeof messageTemplateTypeSchema>;
   topics?: z.infer<typeof topicSchema>[];
   page?: number;
@@ -392,17 +392,7 @@ export async function getAdminDashboardData(filters?: {
     ...(filters?.topics?.length ? { topic: { hasSome: filters.topics } } : {}),
   };
 
-  const [
-    totalMessageTemplates,
-    messageTemplates,
-    users,
-    integrations,
-    channels,
-    channelSettings,
-    messages,
-    reminders,
-    spotlightQueue,
-  ] = await Promise.all([
+  const [totalMessageTemplates, messageTemplates] = await Promise.all([
     prisma.messageTemplate.count({
       where: messageTemplateWhere,
     }),
@@ -414,84 +404,11 @@ export async function getAdminDashboardData(filters?: {
       select: {
         id: true,
         content: true,
+        gif: true,
         type: true,
         topic: true,
         active: true,
         createdAt: true,
-      },
-    }),
-    prisma.user.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        externalProviderId: true,
-      },
-    }),
-    prisma.integration.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        teamName: true,
-        teamId: true,
-        type: true,
-        active: true,
-      },
-    }),
-    prisma.channel.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        publicId: true,
-        channelName: true,
-        type: true,
-        active: true,
-        integrationId: true,
-      },
-    }),
-    prisma.channelSetting.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        channelId: true,
-        timezone: true,
-        timeOfday: true,
-        daysOfWeek: true,
-      },
-    }),
-    prisma.message.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        channelId: true,
-        messageTemplateId: true,
-        status: true,
-        sent_ts: true,
-      },
-    }),
-    prisma.reminder.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        messageId: true,
-        status: true,
-        sent_ts: true,
-      },
-    }),
-    prisma.spotlightMessageQueue.findMany({
-      orderBy: { id: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        channelId: true,
-        members: true,
       },
     }),
   ]);
@@ -506,15 +423,5 @@ export async function getAdminDashboardData(filters?: {
       totalItems: totalMessageTemplates,
       totalPages,
     },
-    tablePreviews: [
-      { name: "User", rows: users },
-      { name: "Integration", rows: integrations },
-      { name: "Channel", rows: channels },
-      { name: "ChannelSetting", rows: channelSettings },
-      { name: "MessageTemplate", rows: messageTemplates.slice(0, 5) },
-      { name: "Message", rows: messages },
-      { name: "Reminder", rows: reminders },
-      { name: "SpotlightMessageQueue", rows: spotlightQueue },
-    ],
   };
 }

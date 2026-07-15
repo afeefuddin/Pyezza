@@ -42,7 +42,7 @@ export default function QuestionFilters({
 
   function pushFilters(nextType: string, nextTopics: Set<Topic>) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", "questions");
+    params.delete("tab");
     params.delete("mode");
     params.delete("page");
 

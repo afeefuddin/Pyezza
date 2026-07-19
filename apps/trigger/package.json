@@ -7,9 +7,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "start": "npx trigger.dev@latest dev",
-    "dev": "yarn with-env npx trigger.dev@latest dev",
-    "deploy": "npx trigger.dev@latest deploy",
+    "start": "npx trigger.dev@4.0.5 dev",
+    "dev": "yarn with-env npx trigger.dev@4.0.5 dev",
+    "deploy": "npx trigger.dev@4.0.5 deploy",
     "lint": "eslint src/**/*.ts",
     "with-env": "yarn run dotenv -e ../../.env"
   },

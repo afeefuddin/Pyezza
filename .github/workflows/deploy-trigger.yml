@@ -49,6 +49,6 @@ jobs:
 
       - name: Deploy Trigger.dev
         working-directory: apps/trigger
-        run: yarn dlx trigger.dev@latest deploy --env prod
+        run: yarn deploy --env prod
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}

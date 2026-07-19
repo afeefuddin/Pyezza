@@ -2,7 +2,7 @@ import { SlackApi } from "@repo/lib/slack-api";
 import { prisma } from "@repo/database";
 import { task } from "@trigger.dev/sdk/v3";
 
-const GEMINI_MODEL = "gemini-2.5-flash-lite";
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
 const GEMINI_SYSTEM_PROMPT = `You write tiny, friendly reactions to answers shared by teammates in a casual Slack channel.
 
 Voice and tone:

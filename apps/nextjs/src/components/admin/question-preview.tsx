@@ -1,3 +1,5 @@
+import { BrandIcon } from "@/components/brand-logo";
+
 type QuestionType = "socialsips" | "wouldyourather" | "spotlight";
 
 type QuestionPreviewProps = {
@@ -40,9 +42,7 @@ export default function QuestionPreview({
   return (
     <div className="rounded-lg border border-slate-200/80 bg-white p-4">
       <div className="mb-3 flex items-center gap-2">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-orange-500 text-sm font-bold text-white">
-          P
-        </div>
+        <BrandIcon className="size-8" alt="" />
         <div className="min-w-0">
           <p className="text-sm font-semibold leading-none text-slate-900">
             Pyezza

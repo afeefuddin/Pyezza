@@ -1,3 +1,5 @@
+import { BrandIcon } from "@/components/brand-logo";
+
 export default function Integration() {
   return (
     <section id="integrations" className="py-20 bg-neutral-900">
@@ -124,14 +126,7 @@ export default function Integration() {
                   id="el-ornigwpf"
                 >
                   <div className="flex items-center gap-3" id="el-r67cpjwe">
-                    <div
-                      className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center"
-                      id="el-9b55j0lq"
-                    >
-                      <span className="text-white text-sm" id="el-mt7neymu">
-                        🥧
-                      </span>
-                    </div>
+                    <BrandIcon className="size-8" />
                     <div className="text-white text-sm" id="el-o7kzui0r">
                       Hey team! Time for our daily question! 🎯
                     </div>
@@ -143,14 +138,7 @@ export default function Integration() {
                   id="el-71b4k4km"
                 >
                   <div className="flex items-center gap-3" id="el-rg3i7aos">
-                    <div
-                      className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center"
-                      id="el-6itf0h90"
-                    >
-                      <span className="text-white text-sm" id="el-dwcphq4h">
-                        🥧
-                      </span>
-                    </div>
+                    <BrandIcon className="size-8" />
                     <div className="text-white text-sm" id="el-am9iz0mr">
                       What's your favorite productivity hack? 💡
                     </div>

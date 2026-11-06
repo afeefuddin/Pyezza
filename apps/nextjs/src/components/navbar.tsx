@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function Navbar() {
   return (
@@ -13,9 +14,7 @@ export default function Navbar() {
         >
           <div className="flex-shrink-0" id="el-sf6a2fbt">
             <Link href="/" className="flex items-center" id="el-n963c0w3">
-              <span className="text-primary font-bold text-2xl animate__animated animate__fadeIn">
-                Pyezza
-              </span>
+              <BrandLogo inverted priority />
             </Link>
           </div>
 

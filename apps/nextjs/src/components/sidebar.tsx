@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { usePathname } from "next/navigation";
 import { Layers } from "lucide-react";
 import useClientUser from "@/hooks/use-client-user";
+import { BrandIcon, BrandLogo } from "@/components/brand-logo";
 
 export default function SidebarDemo({
   children,
@@ -141,13 +142,12 @@ export const Logo = () => {
       href="#"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-primary rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-bold text-2xl text-black dark:text-white whitespace-pre"
       >
-        Pyezza
+        <BrandLogo className="h-9 dark:hidden" />
+        <BrandLogo inverted className="hidden h-9 dark:block" />
       </motion.span>
     </Link>
   );
@@ -158,7 +158,7 @@ export const LogoIcon = () => {
       href="#"
       className="font-normal flex space-x-2 items-center text-sm text-primary py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-primary rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <BrandIcon className="size-9" />
     </Link>
   );
 };
